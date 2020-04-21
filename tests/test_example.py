@@ -1,9 +1,9 @@
-from source.example import add
+from msnotifier.example import add
 
 
-def add_correct():
+def test_add_correct():
     assert add(5, 7) == 12
 
 
-def add_incorrect():
+def test_add_incorrect():
     assert add(15, 8) != 21
