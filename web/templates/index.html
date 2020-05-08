@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <title>Home</title>
+{% endblock %}
+    <br>
+{% block body %}
+
+    {% if emailuser %}
+        <main role="main">
+            <div>
+                <div class="col-sm-8 mx-auto">
+                    <br>
+                    <header id="header">
+                        <h2>Hello, {{ emailuser }}!</h2>
+                        <p>NotifAyy will take care of informing you about stuff!</p> 
+                    </header>                                        
+                </div>
+            </div>
+        </main>
+
+        <h2 class="mx-auto">Create New Alert:</h2>
+        <form action='/alerts' method='POST'>
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="">Webpage URL</span>
+                </div>
+                <input class="form-control" type="text" name='page' id='page' placeholder="youtube.com/youtuber/videos" aria-label="Enter Page">
+            </div>
+            <br>
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="">Alert Title</span>
+                </div>
+                <input class="form-control" type="text" name='title' id='title' placeholder="My Fav Youtuber" aria-label="Enter Title">
+            </div>
+            <br>
+            <!-- TODO: Logged User value handling -->
+            <input class="form-control" type="text" name='currentuser' id='currentuser' value="{{ emailuser }}" style="visibility: hidden; height: 0px;">
+            <input class="btn btn-outline-primary" href='/alerts' style="float: right;" type='submit' value='Add New Alert'>
+            <br>
+        </form>
+        <hr>
+        {% for alert in alerts %}
+            <div class="container-fluid">
+                <h3>{{ alert.title }}
+                <a class="btn btn-outline-danger" href='/alerts/delete/{{alert.id}}' style="width: 80px; float: right; ">Delete</a> 
+                <a class="btn btn-outline-primary" href='/alerts/edit/{{alert.id}}' style="width: 80px; float: right; margin-right: 10px;">Edit</a>
+                </h3>
+            </div>
+            <div class="container-fluid" style="font-size: 0.55em; margin-top: 10px;">
+                <p>Site: {{ alert.page }} <small style="float: right;"> Added on: {{ alert.date_added }}</small> </p>
+            </div>
+
+            <hr>
+            <br>
+        {% endfor %}
+
+    {% else %}
+        <header id="header">
+            <h1>NotifAyy</h1>
+            <p>Get informed when someone post an update anywhere, everywhere.</p> 
+        </header>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="notification is-danger">
+                    <i>{{ messages[0] }}</i>
+                </div>
+            {% endif %}
+        {% endwith %}
+            
+        <form id="signup-form" method="POST" action="/login">
+            <input type="email" name="email" id="email" placeholder="Email Address" />
+            <input type="password" name="password" id="password" placeholder="Password" />
+            <input class="btn btn-outline-primary" href='/register' type="submit" value="Sign Up" />
+            <input class="btn btn-outline-primary" href='/login' type="submit" value="Login" />
+        </form>
+    {% endif %}
+{% endblock %}
