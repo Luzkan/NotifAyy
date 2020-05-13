@@ -20,6 +20,17 @@ users = [
     }
 ]
 
+changes = [
+    '''{
+        'discordId': 367723606832316417,
+        'change': 'change 1'
+    },
+    {
+        'discordId': 702627599138029620,
+        'change': 'change 2'
+    }'''
+]
+
 @app.route('/', methods=['GET'])
 def empty():
     return '<h1>Response</h1>'
@@ -53,6 +64,11 @@ def register():
     }
     users.append(user)
     return flask.jsonify(user), 201
+
+
+@app.route('/changes', methods=['GET'])
+def getChanges():
+    return flask.jsonify(changes)
 
 
 if __name__ == '__main__':
