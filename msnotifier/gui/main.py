@@ -5,6 +5,20 @@ import msnotifier.gui.validator as validator
 import msnotifier.gui.constants as const
 
 
+def add_alert():
+    alerts_list.insert(tk.END,
+                       f"Alert: {alert_title.get()}, URL: {webpage_url.get()}")
+
+
+def delete_alert(event):
+    w = event.widget
+    try:
+        index = w.curselection()[0]
+        alerts_list.delete(index)
+    except IndexError:
+        pass
+
+
 def new_user_msg():
     user_exists_label.grid_forget()
     wrong_data_label.grid_forget()
@@ -44,6 +58,7 @@ def switch_to_manager_frame():
 
     welcome_frame.grid(row=0, column=0, sticky="w")
     data_frame.grid(row=1, column=0, sticky="w")
+    listbox_frame.grid(row=2, column=0, sticky="w")
 
     welcome_label.grid(row=0, column=0, sticky="w")
     logout_button.grid(row=0, column=1, sticky="e")
@@ -51,8 +66,11 @@ def switch_to_manager_frame():
 
     webpage_url_label.grid(row=2, column=0, sticky="w")
     webpage_url.grid(row=2, column=1, sticky="w")
+    add_alert_button.grid(row=3, column=2, sticky="e")
     alert_title_label.grid(row=3, column=0, sticky="w")
     alert_title.grid(row=3, column=1, sticky="w")
+
+    alerts_list.grid(row=0, column=0, sticky="w")
 
 
 def check_sign_up():
@@ -189,13 +207,18 @@ alert_title_label = tk.Label(data_frame,
                              font=const.alerts_font,
                              bg=const.violet,
                              fg=const.white)
-alerts_list = tk.Listbox(data_frame,
-                         bg=const.dark_violet,
-                         fg=const.white,
-                         font=const.alerts_font)
 add_alert_button = tk.Button(data_frame,
                              text=const.add_alert,
                              bg=const.green,
-                             font=const.button_font)
+                             font=const.alerts_font_bold,
+                             command=add_alert)
+
+listbox_frame = tk.Frame(manager_frame, bg=const.violet)
+
+alerts_list = tk.Listbox(listbox_frame,
+                         bg=const.dark_violet,
+                         fg=const.white,
+                         font=const.alerts_font)
+alerts_list.bind('<<ListboxSelect>>', delete_alert)
 
 window.mainloop()
