@@ -1,43 +1,52 @@
 import tkinter as tk
 from pathlib import Path
 
-import msnotifier.gui.validator as validator
+import msnotifier.gui.manager as manager
 import msnotifier.gui.constants as const
 
 
-def add_alert():
-    alerts_list.insert(tk.END,
-                       f"Alert: {alert_title.get()}, URL: {webpage_url.get()}")
+def get_alerts() -> None:
+    alerts_list.delete(0, "end")
+    for alert in manager.get_current_alerts(manager.current_user):
+        alerts_list.insert(tk.END, alert)
 
 
-def delete_alert(event):
+def main_add_alert() -> None:
+    alert_content = f"Alert: {alert_title.get()}, URL: {webpage_url.get()}"
+    alerts_list.insert(tk.END, alert_content)
+    manager.add_alert(manager.current_user, alert_content)
+
+
+def delete_alert(event) -> None:
     w = event.widget
     try:
         index = w.curselection()[0]
         alerts_list.delete(index)
+        manager.delete_alert(manager.current_user, index)
     except IndexError:
         pass
 
 
-def new_user_msg():
+def new_user_msg() -> None:
     user_exists_label.grid_forget()
     wrong_data_label.grid_forget()
     new_user_label.grid(row=2, column=0, sticky="w")
 
 
-def user_exists_msg():
+def user_exists_msg() -> None:
     wrong_data_label.grid_forget()
     new_user_label.grid_forget()
     user_exists_label.grid(row=2, column=0, sticky="w")
 
 
-def wrong_data_msg():
+def wrong_data_msg() -> None:
     user_exists_label.grid_forget()
     new_user_label.grid_forget()
     wrong_data_label.grid(row=2, column=0, sticky="w")
 
 
-def switch_to_main_frame():
+def switch_to_main_frame() -> None:
+    manager.current_user = ""
     manager_frame.place_forget()
     user_exists_label.grid_forget()
     wrong_data_label.grid_forget()
@@ -45,11 +54,11 @@ def switch_to_main_frame():
     main_frame.place(in_=window, anchor="c", relx=0.5, rely=0.5)
 
 
-def switch_to_manager_frame():
+def switch_to_manager_frame() -> None:
     main_frame.place_forget()
     manager_frame.place(in_=window, anchor="c", relx=0.5, rely=0.5)
-
-    welcome_message = f"Hello, {login.get()}!"
+    manager.current_user = login.get()
+    welcome_message = f"Hello, {manager.current_user}!"
     welcome_label = tk.Label(welcome_frame,
                              text=welcome_message,
                              font=const.welcome_font,
@@ -66,23 +75,26 @@ def switch_to_manager_frame():
 
     webpage_url_label.grid(row=2, column=0, sticky="w")
     webpage_url.grid(row=2, column=1, sticky="w")
+    webpage_url.delete(0, "end")
     add_alert_button.grid(row=3, column=2, sticky="e")
     alert_title_label.grid(row=3, column=0, sticky="w")
     alert_title.grid(row=3, column=1, sticky="w")
+    alert_title.delete(0, "end")
 
     alerts_list.grid(row=0, column=0, sticky="w")
+    get_alerts()
 
 
-def check_sign_up():
-    if not validator.user_exists(login.get()):
-        validator.add_new_user(login.get(), password.get())
+def check_sign_up() -> None:
+    if not manager.user_exists(login.get()):
+        manager.add_new_user(login.get(), password.get())
         new_user_msg()
     else:
         user_exists_msg()
 
 
-def validate():
-    if not validator.data_is_valid(login.get(), password.get()):
+def validate() -> None:
+    if not manager.data_is_valid(login.get(), password.get()):
         wrong_data_msg()
     else:
         switch_to_manager_frame()
@@ -172,6 +184,17 @@ manager_frame = tk.Frame(window,
                          bd=15,
                          relief="raised")
 
+listbox_frame = tk.Frame(manager_frame, bg=const.violet)
+
+alerts_list = tk.Listbox(listbox_frame,
+                         bg=const.dark_violet,
+                         fg=const.white,
+                         font=const.alerts_font,
+                         bd=5,
+                         relief="raised",
+                         width="65")
+alerts_list.bind('<<ListboxSelect>>', delete_alert)
+
 welcome_frame = tk.Frame(manager_frame, bg=const.violet)
 
 welcome_info_label = tk.Label(welcome_frame,
@@ -211,14 +234,6 @@ add_alert_button = tk.Button(data_frame,
                              text=const.add_alert,
                              bg=const.green,
                              font=const.alerts_font_bold,
-                             command=add_alert)
-
-listbox_frame = tk.Frame(manager_frame, bg=const.violet)
-
-alerts_list = tk.Listbox(listbox_frame,
-                         bg=const.dark_violet,
-                         fg=const.white,
-                         font=const.alerts_font)
-alerts_list.bind('<<ListboxSelect>>', delete_alert)
+                             command=main_add_alert)
 
 window.mainloop()
