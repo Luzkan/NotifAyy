@@ -27,8 +27,7 @@ CREATE TABLE `Alert` (
   `title` varchar(100) NOT NULL,
   `page` varchar(100) NOT NULL,
   `date_added` datetime NOT NULL,
-  `Messenger` tinyint(1) DEFAULT '0',
-  `Discord` tinyint(1) DEFAULT '0',
+  `notifier` enum('0','1','2','3','4') DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -51,4 +50,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-05-14  1:21:22
+-- Dump completed on 2020-05-18 16:43:30
