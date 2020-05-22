@@ -1,13 +1,17 @@
-
+import smtplib
 from abc import ABC, abstractmethod
 
 import fbchat
+# import telegram as telegram
 from fbchat import ThreadType
 
+
 def retry_logging(func):
-    def wrapper(*args,**kwargs):
+    def wrapper(*args, **kwargs):
         pass
+
     pass
+
 
 class Notifier(ABC):
     """
@@ -16,19 +20,18 @@ class Notifier(ABC):
     """
 
     @abstractmethod
-    def log_into(self,login,password) -> int:
+    def log_into(self, login, password) -> int:
         pass
-
 
     @abstractmethod
-    def message_myself(self,content) -> int:
+    def message_myself(self, content) -> int:
         pass
-
 
 
 class fb_chat(Notifier):
     client: fbchat.Client
-    def log_into(self,login,password):
+
+    def log_into(self, login, password):
         try:
             self.client = fbchat.Client("notifaay@gmail.com", "TestTest123")
         except:
@@ -36,26 +39,43 @@ class fb_chat(Notifier):
         return 1
 
     def message_myself(self, content):
-        sent=self.client.sendMessage(content, thread_id=self.client.uid,thread_type=ThreadType.USER)
+        sent = self.client.sendMessage(content, thread_id=self.client.uid, thread_type=ThreadType.USER)
         if sent:
             return 1
         else:
             return 0
+
+
 class telegram_chat(Notifier):
-    def log_into(self,login,password):
+    # bot = telegram.Bot('TOKEN')
+
+    def log_into(self, login, password):
         pass
+
     def message_myself(self, content):
         pass
+
+
 class discord_chat(Notifier):
     def log_into(self, login, password):
         pass
 
     def message_myself(self, content):
         pass
+
+
 class mail_chat(Notifier):
+    smtpserver: smtplib.SMTP
+    mail: str
+
     def log_into(self, login, password):
-        pass
+        self.smtpserver = smtplib.SMTP("smtp.gmail.com", 587)
+        self.smtpserver.ehlo()
+        self.smtpserver.starttls()
+        self.smtpserver.ehlo()
+        self.smtpserver.login(login, password)
+        self.mail = login
 
     def message_myself(self, content):
-        pass
-
+        self.smtpserver.sendmail(self.mail, self.mail, content)
+        self.smtpserver.close()
