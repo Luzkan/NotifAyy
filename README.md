@@ -1,5 +1,5 @@
 <h1 align="center">NotifAyy</h1>
-  <h3 align="center">Your web tracking pal.</h3>
+  <h3 align="center">Your Web Tracking Pal</h3>
   <p align="center">
     <a href="https://github.com/Luzkan/NotifAyy" align="center"><strong>Explore the App »</strong></a>
     <br />
@@ -13,9 +13,10 @@
 
 - [Introduction](#introduction)
 - [Features](#features)
+- [Usage]($usage)
 - [Setup](#setup)
 - [Feedback](#feedback)
-- [Authors](#authors)
+- [Team](#team)
 
 
 ## Introduction
@@ -44,7 +45,7 @@ A few of the ideas that you can get notified with:
 * When a YouTuber uploads a new video
 * When a blogger posts new blogpost
 * When Wikipedia page get edited
-* Track when a site is available
+* When a site/subsite becomes available
 * ...and many many more!
 
 ## Usage
@@ -55,7 +56,7 @@ A few of the ideas that you can get notified with:
 - 📧 **Confirm e-mail** and log-in
 - 📫 **Set-up** your messaging apps
 - 📑 **Give us** any site you want to track
-- 🐤 **Relax** cause now you are always up to date! 
+- 😺 **Relax** 'cause now you are always up to date! <3
 
 ## Setup
 
@@ -86,10 +87,10 @@ Feel free to send us feedback on wherever you find an option for it or [file an 
 ## Team
 
 
-| <a href="http://github.com/Luzkan/" target="_blank">**Luzkan**</a> | <a href="http://github.com/TeeKey18/" target="_blank">**TeeKay18**</a> | <a href="https://github.com/JakubKazimierski" target="_blank">**JKazimierski**</a> | <a href="https://github.com/Danieldrapala" target="_blank">**DDrapała**</a> | <a href="https://github.com/esavaner" target="_blank">**Esavaner**</a> |
+| <a href="https://github.com/Luzkan/" target="_blank">**Luzkan**</a> | <a href="https://github.com/TeeKay18" target="_blank">**TeeKay18**</a> | <a href="https://github.com/JakubKazimierski" target="_blank">**JKazimierski**</a> | <a href="https://github.com/Danieldrapala" target="_blank">**DDrapała**</a> | <a href="https://github.com/esavaner" target="_blank">**Esavaner**</a> |
 | :---: |:---:| :---:| :---:| :---:|
-| [![Luzkan](https://avatars1.githubusercontent.com/u/1352231?s=100&u=cadaf12690f8715dc8cffa070b89f0e8c3bdabba&v=4?s=100)](http://github.com/Luzkan/)    | [![TeeKay18](https://avatars2.githubusercontent.com/u/20844643?s=100&u=830636c0a358d5748e04eba990eaa757fc72b7da&v=4?s=100)](http://github.com/TeeKey18/) | [![JKazimierski](https://avatars2.githubusercontent.com/u/58040763?s=100&u=a4b536d082cd42996708bc35a09df9907b8fb887&v=4)](https://github.com/JakubKazimierski)  | [![FVCproductions](https://avatars1.githubusercontent.com/u/44144274?s=100&u=5250be6f08e6ba90d2786c7627ee7a3a9a305e4e&v=4)](https://github.com/Danieldrapala)  | [![Esavaner](https://www.laroche.edu/uploadedImages/Directory/placeholder_profile_100_x_100.jpg)](https://github.com/esavaner)  |
-| <a href="https://github.com/Luzkan" target="_blank">`Github`</a> | <a href="https://github.com/TeeKey18" target="_blank">`Github`</a> | <a href="https://github.com/JakubKazimierski" target="_blank">`Github`</a> | <a href="https://github.com/Danieldrapala" target="_blank">`Github`</a> | <a href="https://github.com/esavaner" target="_blank">`Github`</a> |
+| [![Luzkan](https://avatars1.githubusercontent.com/u/1352231?s=150&u=cadaf12690f8715dc8cffa070b89f0e8c3bdabba&v=4?s=150)](https://github.com/Luzkan/)    | [![TeeKay18](https://avatars2.githubusercontent.com/u/20844643?s=150&u=830636c0a358d5748e04eba990eaa757fc72b7da&v=4?s=150)](https://github.com/TeeKay18) | [![JKazimierski](https://avatars2.githubusercontent.com/u/58040763?s=150&u=a4b536d082cd42996708bc35a09df9907b8fb887&v=4)](https://github.com/JakubKazimierski)  | [![FVCproductions](https://avatars1.githubusercontent.com/u/44144274?s=150&u=5250be6f08e6ba90d2786c7627ee7a3a9a305e4e&v=4)](https://github.com/Danieldrapala)  | [![Esavaner](https://cdn.ticketswap.com/public/202003/ea92c768-8b93-407f-a70b-2c40911fcfe1.b89e30c805396dfc2abb94e160c844a5bc7f13de.jpeg)](https://github.com/esavaner)  |
+| <a href="https://github.com/Luzkan" target="_blank">`Github`</a> | <a href="https://github.com/TeeKay18" target="_blank">`Github`</a> | <a href="https://github.com/JakubKazimierski" target="_blank">`Github`</a> | <a href="https://github.com/Danieldrapala" target="_blank">`Github`</a> | <a href="https://github.com/esavaner" target="_blank">`Github`</a> |
 
 ---
 
