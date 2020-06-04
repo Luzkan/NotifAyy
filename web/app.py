@@ -2,7 +2,8 @@ from flask import Flask, render_template, request, redirect, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, LoginManager, login_user
 from datetime import datetime
-
+from passlib.hash import sha256_crypt
+# pip install passlib (507kb, guys)
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'xDDDDsupresikretKEy'
@@ -64,8 +65,9 @@ def auth():
             flash('Email address already exists')
             return redirect('/index.html')
 
-        # TODO: Hash the Password
-        new_user = User(email=user_email, password=user_password)
+        # Hashing the Password
+        password_hashed = sha256_crypt.encrypt(user_password)
+        new_user = User(email=user_email, password=password_hashed)
 
         # Add new user to DB
         db.session.add(new_user)
@@ -88,8 +90,9 @@ def login_post():
 
         user = User.query.filter_by(email=user_email).first()
 
-        # TODO: Hash password and check it with has in db
-        if not user or not (user.password == user_password):
+        # Hash password and check it with the one in db (which was hased on registry)
+        password_hashed = sha256_crypt.encrypt(user_password)
+        if not user or not (sha256_crypt.verify(user.password, password_hashed)):
             flash('Please check your login details and try again.')
             return redirect('/index.html') 
 
