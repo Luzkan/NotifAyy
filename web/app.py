@@ -5,6 +5,16 @@ from datetime import datetime
 from passlib.hash import sha256_crypt
 # pip install passlib (507kb, guys)
 
+# ===== Notice Info 04-06-2020 
+#   Keep in mind that expanding on existing models in DB
+#   Will caues error due to unexisting columns, so:
+#   Navigate to ./web (here's the app.py)
+#   > python
+#   > from app import db
+#   > db.reflect()
+#   > db.drop_all()
+#   > db.create_all()
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'xDDDDsupresikretKEy'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///notifayy.db'
@@ -90,7 +100,7 @@ def login_post():
 
         user = User.query.filter_by(email=user_email).first()
 
-        # Hash password and check it with the one in db (which was hased on registry)
+        # Hash password and check it with the one in db (which was hashed on registration)
         password_hashed = sha256_crypt.encrypt(user_password)
         if not user or not (sha256_crypt.verify(user.password, password_hashed)):
             flash('Please check your login details and try again.')

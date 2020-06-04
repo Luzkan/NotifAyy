@@ -121,7 +121,7 @@
     {% else %}
         <header id="header">
             <h1>NotifAyy</h1>
-            <p>Get informed when someone post an update anywhere, everywhere.</p> 
+            <p >Get informed when someone post an update anywhere, everywhere.</p> 
         </header>
 
         {% with messages = get_flashed_messages() %}
@@ -135,8 +135,24 @@
         <form id="signup-form" method="POST" action="/login">
             <input type="email" name="email" id="email" placeholder="Email Address" />
             <input type="password" name="password" id="password" placeholder="Password" />
-            <input class="btn btn-outline-primary" href='/register' type="submit" value="Sign Up" />
+
+
+            <div class="container">
+                <div class="row">
+                    <input class="btn btn-outline-primary" href='/login' type="submit" value="Login" style="margin-right: 10px;" />
+                    <input class="btn btn-outline-primary" href='/register' type="submit" value="Sign Up" />
+                    
+                  
+                    <input type="checkbox" class="form-check-input" id="remember">
+                    <label class="form-check-label text-nowrap" style="font-size: 20px; margin-top: 5px;" for="remember">Remember me</label>
+                  
+                </div>
+            </div>
+
+            <!-- <input class="btn btn-outline-primary" href='/register' type="submit" value="Sign Up" />
             <input class="btn btn-outline-primary" href='/login' type="submit" value="Login" />
+                <input type="checkbox" class="form-check-input" id="remember">
+                <label class="form-check-label" for="remember"> </label> -->
         </form>
     {% endif %}
 {% endblock %}
