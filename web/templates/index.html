@@ -37,27 +37,71 @@
             <br>
             
             <!-- App Buttons Booleans -->
-            <button type="button" class="btn btn-outline-dark" name='messenger' id='messenger' data-toggle="button" aria-pressed="false" autocomplete="off">
-                Messenger
-            </button>
+            <div class="btn-group" role="group" aria-label="Basic example">
+                <button type="button" class="btn btn-outline-dark" name='messenger' id='messenger' data-toggle="button" aria-pressed="false" autocomplete="off">
+                    Messenger
+                </button>
+                <button type="button" class="btn btn-outline-dark fas fa-cog" data-toggle="collapse" aria-pressed="false" data-target="#collapseMessenger"></button>
+            </div>
 
-            <button type="button" class="btn btn-outline-dark" name='discord' id='discord' data-toggle="button" aria-pressed="false" autocomplete="off">
-                Discord
-            </button>
+            <div class="btn-group" role="group" aria-label="Basic example">
+                <button type="button" class="btn btn-outline-dark" name='discord' id='discord' data-toggle="button" aria-pressed="false" autocomplete="off">
+                    Discord
+                </button>
+                <button type="button" class="btn btn-outline-dark fas fa-cog" data-toggle="collapse" aria-pressed="false" data-target="#collapseDiscord"></button>
+            </div>
 
-            <button type="button" class="btn btn-outline-dark" name='telegram' id='telegram' data-toggle="button" aria-pressed="false" autocomplete="off">
-                Telegram
-            </button>
+            <div class="btn-group" role="group" aria-label="Basic example">
+                <button type="button" class="btn btn-outline-dark" name='telegram' id='telegram' data-toggle="button" aria-pressed="false" autocomplete="off">
+                    Telegram
+                </button>
+                <button type="button" class="btn btn-outline-dark fas fa-cog" data-toggle="collapse" aria-pressed="false" data-target="#collapseTelegram"></button>
+            </div>
 
             <input class="btn btn-outline-primary" href='/alerts' style="float: right;" type='submit' value='Add New Alert'>
 
             <!-- TODO: Logged User value handling -->
             <input class="form-control" type="text" name='currentuser' id='currentuser' value="{{ emailuser }}" style="visibility: hidden; height: 0px;">
-            
             <br>
-
-
         </form>
+
+        <!-- This is the pop-up that appears after pressing "connect your apps" -->
+        <div class="collapse" id="collapseMessenger">
+            <div class="container-fluid">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text" id="basic-addon1">Your Facebook Page:</span>
+                    </div>
+                    <input type="text" class="form-control" placeholder="facebook.com/notiff.ayy" aria-label="Username" style="margin-right: 10px;" aria-describedby="basic-addon1">
+                    <button type="button" id="connect_button_m" class="btn btn-outline-success">Connect</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="collapse" id="collapseDiscord">
+            <div class="container-fluid">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text" id="basic-addon1">Your Discord Name:</span>
+                    </div>
+                    <input type="text" class="form-control" placeholder="Notifayy#2934" aria-label="Username" style="margin-right: 10px;" aria-describedby="basic-addon1">
+                    <button type="button" id="connect_button_d" class="btn btn-outline-success">Connect</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="collapse" id="collapseTelegram">
+            <div class="container-fluid">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text" id="basic-addon1">Your Telegram Name:</span>
+                    </div>
+                    <input type="text" class="form-control" placeholder="Notifayy#1337" aria-label="Username" style="margin-right: 10px;" aria-describedby="basic-addon1">
+                    <button type="button" id="connect_button_t" class="btn btn-outline-success">Connect</button>
+                </div>
+            </div>
+        </div>
+
         <hr>
         {% for alert in alerts %}
             <div class="container-fluid">

@@ -37,6 +37,28 @@
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
         crossorigin="anonymous"></script>
     <script src="static/js/main.js"></script>
+
+    
+    <script>
+        // Adding simple spinning circle after pressing connect (on apps connecting buttons)
+        // Separting stuff that'll happen after pressing each of them if you guys would like to
+        // Add some JS to the connection functionality
+        $(document).ready(function() {
+            $("#connect_button_d").click(function() {
+                $(this).prop("disabled", true);
+                $(this).html(`<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Connecting` );
+            });
+            $("#connect_button_m").click(function() {
+                $(this).prop("disabled", true);
+                $(this).html(`<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Connecting` );
+            });
+            $("#connect_button_t").click(function() {
+                $(this).prop("disabled", true);
+                $(this).html(`<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Connecting` );
+            });
+        });
+    </script>
+
 </body>
 
 
