@@ -18,16 +18,29 @@ login_manager.init_app(app)
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-# TODO: Alert has User ID to determine whose Alert it is
-# TODO: Booleans for various supported messaging apps
+# So it's better to use "app_id" (int) that will specify a combination
+# of what apps user want to be informed on. This way, we do not add more
+# columns to "Alert" as more supporting apps are included to the app.
 class Alert(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     page = db.Column(db.String(100), nullable=False)
     date_added = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    # user_id = db.Column(db.Integer, nullable=False)
+    # apps_id = db.Column(db.Integer, nullable=False)
 
     def __repr__(self):
         return 'Alert # ' + str(self.id)
+
+class Apps(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    discord = db.Column(db.Boolean, nullable=False, default=False)
+    telegram = db.Column(db.Boolean, nullable=False, default=False)
+    messenger = db.Column(db.Boolean, nullable=False, default=False)
+
+    def __repr__(self):
+        return f'Apps # {str(self.id)}. Status (d/t/m): ({str(self.discord)}/{str(self.telegram)}/{str(self.messenger)}) '
+
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -89,8 +102,22 @@ def login_post():
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
+        # Creating App Alert
+        messenger_bool = request.form['messenger']
+        telegram_bool = request.form['telegram']
+        discord_bool = request.form['discord']
+        new_apps_bool = Apps(discord=discord_bool, telegram=telegram_bool, messenger=messenger_bool)
+
+        # First we add the app alert, then flush to retrieve it's unique ID
+        db.session.add(new_apps_bool)
+        db.session.flush()
+
+        # Creating new Alert
         alert_title = request.form['title']
         alert_page = request.form['page']
+        # TODO: User_ID
+        apps_bools_id = new_apps_bool.id
+        #new_alert = Alert(title=alert_title, page=alert_page, user_id=current_user_id, apps_id=apps_bools_id)
         new_alert = Alert(title=alert_title, page=alert_page)
         db.session.add(new_alert)
         db.session.commit()
