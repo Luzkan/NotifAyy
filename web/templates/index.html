@@ -13,7 +13,7 @@
                     <br>
                     <header id="header">
                         <h2>Hello, {{ emailuser }}!</h2>
-                        <p>NotifAyy will take care of informing you about stuff!</p> 
+                        <p class="text-nowrap bd-highlight">No worries, NotifAyy will check stuff for you!</p> 
                     </header>                                        
                 </div>
             </div>
@@ -35,10 +35,28 @@
                 <input class="form-control" type="text" name='title' id='title' placeholder="My Fav Youtuber" aria-label="Enter Title">
             </div>
             <br>
+            
+            <!-- App Buttons Booleans -->
+            <button type="button" class="btn btn-outline-dark" data-toggle="button" aria-pressed="false" autocomplete="off">
+                Messenger
+            </button>
+
+            <button type="button" class="btn btn-outline-dark" data-toggle="button" aria-pressed="false" autocomplete="off">
+                Discord
+            </button>
+
+            <button type="button" class="btn btn-outline-dark" data-toggle="button" aria-pressed="false" autocomplete="off">
+                Telegram
+            </button>
+
+            <input class="btn btn-outline-primary" href='/alerts' style="float: right;" type='submit' value='Add New Alert'>
+
             <!-- TODO: Logged User value handling -->
             <input class="form-control" type="text" name='currentuser' id='currentuser' value="{{ emailuser }}" style="visibility: hidden; height: 0px;">
-            <input class="btn btn-outline-primary" href='/alerts' style="float: right;" type='submit' value='Add New Alert'>
+            
             <br>
+
+
         </form>
         <hr>
         {% for alert in alerts %}
