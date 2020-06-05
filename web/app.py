@@ -105,9 +105,7 @@ def auth():
 
         flash('Registration went all fine! :3 You can now log in!')
         return redirect('/')
-        #return redirect('/index.html')
     else:
-
         app.logger.info('Method: NOT POST')
         all_alerts = Alert.query.order_by(Alert.date_added).all()
         all_users = User.query.order_by(User.id).all()
@@ -140,15 +138,12 @@ def login_post():
 
         app.logger.info("Succesfully logged in user: " + user_email)
         login_user(user, remember=remember)
-        print("Remember? ", remember)
         session["remember_me"] = True if remember else False
     
         all_alerts = Alert.query.order_by(Alert.date_added).all()
 
         # Session is a way to keep values when moving around pages
         session["email"] = user_email
-        print(session)
-        # session["user_id"] = user["user_email"]
 
         return render_template('index.html', alerts=all_alerts, emailuser=user_email)
 
@@ -156,7 +151,9 @@ def login_post():
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    app.logger.info('Landing Page Visited.')
     if request.method == 'POST':
+        app.logger.debug('Landing Page Visited with method POST')
         # Creating App Alert
         messenger_bool = request.form['messenger']
         telegram_bool = request.form['telegram']
@@ -178,15 +175,16 @@ def index():
         db.session.commit()
         return redirect('/index.html')
     else:
+        app.logger.debug('Landing Page Visited without method POST')
         all_alerts = Alert.query.order_by(Alert.date_added).all()
         all_users = User.query.order_by(User.id).all()
         return render_template('index.html', alerts=all_alerts, users=all_users)
 
 @app.route('/alerts', methods=['GET', 'POST'])
 def alerts():
-    app.logger.info('Requesting Alerts.')
+    app.logger.info('Requesting Alerts. (/alerts)')
     if request.method == 'POST':
-        app.logger.info('Adding New Alert.')
+        app.logger.info('Adding New Alert. (/alerts)')
         alert_title = request.form['title']
         alert_page = request.form['page']
         new_alert = Alert(title=alert_title, page=alert_page)
@@ -210,12 +208,7 @@ def delete(id):
     alert = Alert.query.get_or_404(id)
     db.session.delete(alert)
     db.session.commit()
-    print(session)
-    # TODO: Do this properly when a way to pass logged user will be
-    #       conceptualized
-    all_alerts = Alert.query.order_by(Alert.date_added).all()
-    return render_template('index.html', alerts=all_alerts, emailuser=session['email'])
-    # return render_template('index.html', emailuser=session['email'])
+    return redirect('/index.html')
 
 # TODO: Alert Edit to be handled on the same page,
 #       by changing <p>'s to <inputs> and edit there
@@ -237,7 +230,7 @@ def edit(id):
 
 @app.route('/alerts/new', methods=['GET', 'POST'])
 def new_alert():
-    app.logger.info('Adding New Alert.')
+    app.logger.info('Adding New Alert (/alerts/new).')
     if request.method == 'POST':
         alert.title = request.form['title']
         alert.page = request.form['page']
@@ -246,6 +239,11 @@ def new_alert():
         db.session.commit()
         return redirect('/index.html')
 
+
+@app.route('/index.html', methods=['GET', 'POST'])
+def go_home():
+    all_alerts = Alert.query.order_by(Alert.date_added).all()
+    return render_template('index.html', alerts=all_alerts, emailuser=session['email'])
 
 if __name__ == "__main__":
     app.run(debug=True)
