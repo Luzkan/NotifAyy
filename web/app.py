@@ -154,6 +154,11 @@ def login_post():
 
         user = User.query.filter_by(email=user_email).first()
 
+        if not user:
+            flash("There's no registered account with given email adress.")
+            app.logger.warning(" User doesn't exist: " + user_email)
+            return redirect('/') 
+
         # --- Debugging Passwords check
         #     Info: I'm printing hashed version, but we actually
         #           compare the original string with hashed version in db
@@ -164,7 +169,7 @@ def login_post():
 
         if not user or not (sha256_crypt.verify(user_password, user.password)):
             flash('Please check your login details and try again.')
-            app.logger.warning("Wrong Credentials / User doesn't exist: " + user_email)
+            app.logger.warning("Wrong Credentials" + user_email)
             return redirect('/') 
 
         app.logger.info("Succesfully logged in user: " + user_email)
