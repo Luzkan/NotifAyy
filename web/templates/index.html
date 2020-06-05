@@ -106,11 +106,15 @@
         {% for alert in alerts %}
             <div class="container-fluid">
                 <h3>{{ alert.title }}
-                <a class="btn btn-outline-danger" href='/alerts/delete/{{alert.id}}' style="width: 80px; float: right; ">Delete</a> 
-                <a class="btn btn-outline-primary" href='/alerts/edit/{{alert.id}}' style="width: 80px; float: right; margin-right: 10px;">Edit</a>
+                <a class="btn btn-outline-danger" href='/alerts/delete/{{alert.id}}' style="width: 80px; float: right; margin-right: 0px;">Delete</a> 
+                <a class="btn btn-outline-primary" href='/alerts/edit/{{alert.id}}' style="width: 80px; float: right; margin-right: 5px;">Edit</a>
+                <!-- Here are the icons for devices where the app will ping if change was found -->
+                <a class="btn btn-outline-dark fab fa-telegram" aria-pressed="false" style="float: right; margin-right: 15px;" disabled="true"></a>
+                <a class="btn btn-outline-dark fab fa-discord" aria-pressed="false" style="float: right; margin-right: 5px;" disabled="true"></a>
+                <a class="btn btn-outline-dark fas fa-comment" aria-pressed="false" style="float: right; margin-right: 5px;" disabled="true"></a>
                 </h3>
             </div>
-            <div class="container-fluid" style="font-size: 0.55em; margin-top: 10px;">
+            <div class="container-fluid" style="font-size: 0.65em; margin-top: 10px; ">
                 <p>Site: {{ alert.page }} <small style="float: right;"> Added on: {{ alert.date_added }}</small> </p>
             </div>
 

@@ -222,6 +222,10 @@ h6 {
   font-size: 0.7em;
   line-height: 1.5em; }
 
+p.right {
+  float: right !important;
+  margin-right: 10px !important; }
+
 sub {
   font-size: 0.8em;
   position: relative;
@@ -303,6 +307,7 @@ header h6 + p {
     display: none; } }
 
 /* Icon */
+
 .icon {
   text-decoration: none;
   border-bottom: none;
