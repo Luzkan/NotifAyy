@@ -23,7 +23,11 @@
             <li><a href="#" class="icon fa-envelope"><span class="label">Email</span></a></li>
         </ul>
         <ul class="copyright">
-            <li>&copy; NotifAyy.</li><li>Credits: <a href="https://github.com/Luzkan/NotifAyy/">GitHub Project Team :*</a></li>
+            <li>&copy; NotifAyy.</li>
+            <li>Credits: <a href="https://github.com/Luzkan/NotifAyy/">GitHub Project Team :*</a></li>
+            {% if emailuser %}
+                <li><a href="/logout">Logout</a></li>
+            {% endif %}
         </ul>
     </footer>
 

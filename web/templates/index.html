@@ -10,7 +10,7 @@
 
     
     <!-- User is logged in -->
-    {% if alerts %}
+    {% if emailuser %}
         <!-- Title -->
         <main role="main">
             <div>
@@ -183,6 +183,15 @@
             }
         </script>
 
+        <!-- Changing display dynamically depending on amount of stuff to print -->
+        {% if alerts|length <= 2 %}
+        <style>
+            body {
+                justify-content: center;
+            }
+        </style>
+        {% endif %}
+
     <script>
         // That's the way I figured out to make that ambitous plan to edit on site possible
         function send_form(path, params, method='POST') {
@@ -232,7 +241,11 @@
             </div>
         </form>
 
-        
+        <style>
+            body {
+                justify-content: center;
+            }
+        </style>
 
     {% endif %}
     <script>

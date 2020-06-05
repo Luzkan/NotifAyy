@@ -1,7 +1,7 @@
 import logging
 from flask import Flask, render_template, request, redirect, flash, session
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import UserMixin, LoginManager, login_user
+from flask_login import UserMixin, LoginManager, login_user, logout_user
 from datetime import datetime
 from passlib.hash import sha256_crypt
 
@@ -77,12 +77,15 @@ def get_apps(all_alerts):
     return all_apps
 
 def remember_me_handle():
-    if session["remember_me"]:
-        app.logger.info('User was logged in - printing his site.')
-        all_alerts = get_alerts()
-        return render_template('index.html', alerts=all_alerts, emailuser=session['email'])
+    if "_user_id" in session:
+        if session["remember_me"]:
+            app.logger.info('User was logged in - printing his site.')
+            all_alerts = get_alerts()
+            return render_template('index.html', alerts=all_alerts, emailuser=session['email'])
+        else:
+            app.logger.info('User was not logged in - printing landing page.')
+            return render_template('index.html')
     else:
-        app.logger.info('User was not logged in - printing landing page.')
         return render_template('index.html')
 
 class Apps(db.Model):
@@ -260,6 +263,11 @@ def new_alert():
 def go_home():
     all_alerts = get_alerts()
     return render_template('index.html', alerts=all_alerts, emailuser=session['email'])
+
+@app.route('/logout', methods=['GET', 'POST'])
+def logout():
+    logout_user()
+    return redirect('/')
 
 if __name__ == "__main__":
     app.run(debug=True)
