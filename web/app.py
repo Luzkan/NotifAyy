@@ -91,8 +91,8 @@ def auth():
         # If user doesn't exist, redirect back
         if user: 
             flash('Email address already exists')
-            app.logger.warn("Email adress already exist in the database.")
-            return redirect('/index.html')
+            app.logger.warning("Email adress already exist in the database.")
+            return redirect('/')
 
         app.logger.info("Succesfully added new user to database.")
         # Hashing the Password
@@ -103,7 +103,9 @@ def auth():
         db.session.add(new_user)
         db.session.commit()
 
-        return redirect('/index.html')
+        flash('Registration went all fine! :3 You can now log in!')
+        return redirect('/')
+        #return redirect('/index.html')
     else:
 
         app.logger.info('Method: NOT POST')
@@ -123,18 +125,17 @@ def login_post():
 
         user = User.query.filter_by(email=user_email).first()
 
-        # Hash password and check it with the one in db (which was hashed on registration)
-        password_hashed = sha256_crypt.hash(user_password)
-
         # --- Debugging Passwords check
-        app.logger.debug("Passwords: (input: " + password_hashed + ", db: " + user.password + ")")
-        res = (sha256_crypt.verify(user.password, password_hashed))
+        #     Info: I'm printing hashed version, but we actually
+        #           compare the original string with hashed version in db
+        app.logger.debug("Passwords: (input: " + sha256_crypt.hash(user_password) + ", db: " + user.password + ")")
+        res = (sha256_crypt.verify(user_password, user.password))
         app.logger.debug("Result of pass check: " + str(res))
         # ---
 
-        if not user or not (sha256_crypt.verify(user.password, password_hashed)):
+        if not user or not (sha256_crypt.verify(user_password, user.password)):
             flash('Please check your login details and try again.')
-            app.logger.warn("Wrong Credentials / User doesn't exist" + user_email)
+            app.logger.warning("Wrong Credentials / User doesn't exist: " + user_email)
             return redirect('/') 
 
         app.logger.info("Succesfully logged in user: " + user_email)
