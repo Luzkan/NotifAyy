@@ -137,7 +137,7 @@
             <div class="container-fluid">
                 <h3><span contenteditable="true" class='t-{{alert.id}}'>{{ alert.title }}</span>
                 <a class="btn btn-outline-danger" formaction='/alerts/delete/{{alert.id}}' type="submit" href='/alerts/delete/{{alert.id}}' style="width: 80px; float: right; margin-right: 0px;">Delete</a> 
-                <a class="btn btn-outline-primary" onclick="edit_alert_{{alert.id}}()" href='#' style="width: 80px; float: right; margin-right: 5px;">Edit</a>
+                <a class="btn btn-outline-primary" onclick="edit_alert({{alert.id}})" href='#' style="width: 80px; float: right; margin-right: 5px;">Edit</a>
 
                 <!-- Here are the icons for devices where the app will ping if change was found -->
                 <a class="btn btn-outline-dark fab fa-telegram" data-toggle="button" checked style="float: right; margin-right: 15px;"></a>
@@ -150,18 +150,18 @@
             </div>
             <hr>
             <!-- This is to live-edit alert informations -->
-            <script>
-                function edit_alert_{{alert.id}}(){
-                    var g_title = $(".t-{{alert.id}}").text()
-                    var g_page = $(".p-{{alert.id}}").text()
-                    send_form('/alerts/edit/{{alert.id}}', {title: g_title, page: g_page})
-                }
-            </script>
             <br>
         </form>
 
         {% endfor %}
 
+        <script>
+            function edit_alert(alert_id){
+                var g_title = $(".t-"+alert_id).text()
+                var g_page = $(".p-"+alert_id).text()
+                send_form('/alerts/edit/'+alert_id, {title: g_title, page: g_page})
+            }
+        </script>
 
     <script>
         // That's the way I figured out to make that ambitous plan to edit on site possible
