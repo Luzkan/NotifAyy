@@ -6,10 +6,11 @@
     <br>
 {% block body %}
 
+    
 
+    
     <!-- User is logged in -->
-    {% if emailuser %}
-
+    {% if alerts %}
         <!-- Title -->
         <main role="main">
             <div>
@@ -140,9 +141,25 @@
                 <a class="btn btn-outline-primary" onclick="edit_alert({{alert.id}})" href='#' style="width: 80px; float: right; margin-right: 5px;">Edit</a>
 
                 <!-- Here are the icons for devices where the app will ping if change was found -->
-                <a class="btn btn-outline-dark fab fa-telegram" data-toggle="button" checked style="float: right; margin-right: 15px;"></a>
-                <a class="btn btn-outline-dark fab fa-discord" data-toggle="button" style="float: right; margin-right: 5px;"></a>
-                <a class="btn btn-outline-dark fas fa-comment" data-toggle="button" style="float: right; margin-right: 5px;"></a>
+                {% if alert.telegram %}
+                    <a class="btn btn-outline-dark fab fa-telegram active" data-toggle="button" style="float: right; margin-right: 15px;"></a>
+                {% else %}
+                    <a class="btn btn-outline-dark fab fa-telegram" data-toggle="button" style="float: right; margin-right: 15px;"></a>
+                {% endif %}
+
+                {% if alert.discord %}
+                    <a class="btn btn-outline-dark fab fa-discord active" data-toggle="button" style="float: right; margin-right: 5px;"></a>
+                {% else %}
+                    <a class="btn btn-outline-dark fab fa-discord" data-toggle="button" style="float: right; margin-right: 5px;"></a>
+                {% endif %}
+
+                {% if alert.messenger %}
+                    <a class="btn btn-outline-dark fas fa-comment active" data-toggle="button" style="float: right; margin-right: 5px;"></a>
+                {% else %}
+                    <a class="btn btn-outline-dark fas fa-comment" data-toggle="button" style="float: right; margin-right: 5px;"></a>
+                {% endif %}
+
+
                 </h3>
             </div>
             <div class="container-fluid" style="font-size: 0.65em; margin-top: 10px; ">

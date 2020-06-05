@@ -59,7 +59,22 @@ class Alert(db.Model):
 
 def get_alerts():
     cur_user_id = session["_user_id"]
-    return Alert.query.filter_by(user_id=cur_user_id).order_by(Alert.date_added).all()
+    all_alerts = Alert.query.filter_by(user_id=cur_user_id).order_by(Alert.date_added).all()
+    all_apps = get_apps(all_alerts)
+
+    # Filling remaining booleans, it'll be much easier to retrieve them on site
+    for alert in all_alerts:
+        alert.messenger = all_apps[alert.id].messenger
+        alert.discord = all_apps[alert.id].discord
+        alert.telegram = all_apps[alert.id].telegram
+
+    return all_alerts
+
+def get_apps(all_alerts):
+    all_apps = {}
+    for alert in all_alerts:
+        all_apps[alert.id] = Apps.query.get(alert.apps_id)
+    return all_apps
 
 def remember_me_handle():
     if session["remember_me"]:
