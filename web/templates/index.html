@@ -72,13 +72,6 @@
                     var g_discord = cap($("#discord_new").attr('aria-pressed'));
                     var g_messenger = cap($("#messenger_new").attr('aria-pressed'));
                     var g_telegram = cap($("#telegram_new").attr('aria-pressed'));
-
-                    console.log("Title: " + g_title);
-                    console.log("g_page: " + g_page);
-                    console.log("g_discord: " + g_discord);
-                    console.log("g_messenger: " + g_messenger);
-                    console.log("g_telegram: " + g_telegram);
-
                     send_form('/alerts', {title: g_title, page: g_page, discord: g_discord, messenger: g_messenger, telegram: g_telegram})
                 }
                 
@@ -225,7 +218,6 @@
     <script>
         // This is to retrieve button checkbox value
         function selectionChanged(element) {
-            console.log(element)
             if (element.checked) {
                 element.value = "True"
             } else {

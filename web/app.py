@@ -51,11 +51,24 @@ class Alert(db.Model):
     title = db.Column(db.String(100), nullable=False)
     page = db.Column(db.String(100), nullable=False)
     date_added = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-    # user_id = db.Column(db.Integer, nullable=False)
-    # apps_id = db.Column(db.Integer, nullable=False)
+    user_id = db.Column(db.Integer, nullable=False)
+    apps_id = db.Column(db.Integer, nullable=False)
 
     def __repr__(self):
         return 'Alert # ' + str(self.id)
+
+def get_alerts():
+    cur_user_id = session["_user_id"]
+    return Alert.query.filter_by(user_id=cur_user_id).order_by(Alert.date_added).all()
+
+def remember_me_handle():
+    if session["remember_me"]:
+        app.logger.info('User was logged in - printing his site.')
+        all_alerts = get_alerts()
+        return render_template('index.html', alerts=all_alerts, emailuser=session['email'])
+    else:
+        app.logger.info('User was not logged in - printing landing page.')
+        return render_template('index.html')
 
 class Apps(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -140,45 +153,27 @@ def login_post():
         login_user(user, remember=remember)
         session["remember_me"] = True if remember else False
     
-        all_alerts = Alert.query.order_by(Alert.date_added).all()
+        all_alerts = get_alerts()
 
         # Session is a way to keep values when moving around pages
         session["email"] = user_email
 
         return render_template('index.html', alerts=all_alerts, emailuser=user_email)
+    else:
+        return remember_me_handle()
 
     return redirect('/')
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
 def index():
     app.logger.info('Landing Page Visited.')
-    if request.method == 'POST':
-        app.logger.debug('Landing Page Visited with method POST')
-        # Creating App Alert
-        messenger_bool = get_bool(request.form['messenger'])
-        telegram_bool = get_bool(request.form['telegram'])
-        discord_bool = get_bool(request.form['discord'])
-        new_apps_bool = Apps(discord=discord_bool, telegram=telegram_bool, messenger=messenger_bool)
-
-        # First we add the app alert, then flush to retrieve it's unique ID
-        db.session.add(new_apps_bool)
-        db.session.flush()
-
-        # Creating new Alert
-        alert_title = request.form['title']
-        alert_page = request.form['page']
-        current_user_id = session["_user_id"]
-        apps_bools_id = new_apps_bool.id
-        #new_alert = Alert(title=alert_title, page=alert_page, user_id=current_user_id, apps_id=apps_bools_id)
-        new_alert = Alert(title=alert_title, page=alert_page)
-        db.session.add(new_alert)
-        db.session.commit()
-        return redirect('/index.html')
+    if session["remember_me"]:
+        app.logger.info('User was logged in - printing his site.')
+        all_alerts = get_alerts()
+        return render_template('index.html', alerts=all_alerts, emailuser=session['email'])
     else:
-        app.logger.debug('Landing Page Visited without method POST')
-        all_alerts = Alert.query.order_by(Alert.date_added).all()
-        all_users = User.query.order_by(User.id).all()
-        return render_template('index.html', alerts=all_alerts, users=all_users)
+        app.logger.info('User was not logged in - printing landing page.')
+        return render_template('index.html')
 
 def get_bool(string):
     if string == "True" or string == "true":
@@ -206,22 +201,14 @@ def alerts():
         alert_page = request.form['page']
         current_user_id = session["_user_id"]
         apps_bools_id = new_apps_bool.id
-        #new_alert = Alert(title=alert_title, page=alert_page, user_id=current_user_id, apps_id=apps_bools_id)
-        new_alert = Alert(title=alert_title, page=alert_page)
+        new_alert = Alert(title=alert_title, page=alert_page, user_id=current_user_id, apps_id=apps_bools_id)
         db.session.add(new_alert)
         db.session.commit()
 
-        all_alerts = Alert.query.order_by(Alert.date_added).all()
+        all_alerts = get_alerts()
         return render_template('index.html', alerts=all_alerts, emailuser=session['email'])
     else:
-        if session["remember_me"]:
-            app.logger.info('User was logged in - printing his site.')
-            all_alerts = Alert.query.order_by(Alert.date_added).all()
-            return render_template('index.html', alerts=all_alerts, emailuser=session['email'])
-        else:
-            app.logger.info('User was not logged in - printing landing page.')
-            print(session)
-            return render_template('index.html')
+        return remember_me_handle()
 
 @app.route('/alerts/delete/<int:id>')
 def delete(id):
@@ -258,7 +245,7 @@ def new_alert():
 
 @app.route('/index.html', methods=['GET', 'POST'])
 def go_home():
-    all_alerts = Alert.query.order_by(Alert.date_added).all()
+    all_alerts = get_alerts()
     return render_template('index.html', alerts=all_alerts, emailuser=session['email'])
 
 if __name__ == "__main__":
