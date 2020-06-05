@@ -1,5 +1,5 @@
 import logging
-from flask import Flask, render_template, request, redirect, flash
+from flask import Flask, render_template, request, redirect, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, LoginManager, login_user
 from datetime import datetime
@@ -140,7 +140,16 @@ def login_post():
 
         app.logger.info("Succesfully logged in user: " + user_email)
         login_user(user, remember=remember)
+        print("Remember? ", remember)
+        session["remember_me"] = True if remember else False
+    
         all_alerts = Alert.query.order_by(Alert.date_added).all()
+
+        # Session is a way to keep values when moving around pages
+        session["email"] = user_email
+        print(session)
+        # session["user_id"] = user["user_email"]
+
         return render_template('index.html', alerts=all_alerts, emailuser=user_email)
 
     return redirect('/')
@@ -175,7 +184,6 @@ def index():
 
 @app.route('/alerts', methods=['GET', 'POST'])
 def alerts():
-    alert_user = request.form['currentuser']
     app.logger.info('Requesting Alerts.')
     if request.method == 'POST':
         app.logger.info('Adding New Alert.')
@@ -185,39 +193,46 @@ def alerts():
         db.session.add(new_alert)
         db.session.commit()
         all_alerts = Alert.query.order_by(Alert.date_added).all()
-        return render_template('index.html', alerts=all_alerts, emailuser=alert_user)
+        return render_template('index.html', alerts=all_alerts, emailuser=session['email'])
     else:
-        app.logger.info('Requesting All Alerts.')
-        all_alerts = Alert.query.order_by(Alert.date_added).all()
-        return render_template('index.html', alerts=all_alerts)
+        if session["remember_me"]:
+            app.logger.info('User was logged in - printing his site.')
+            all_alerts = Alert.query.order_by(Alert.date_added).all()
+            return render_template('index.html', alerts=all_alerts, emailuser=session['email'])
+        else:
+            app.logger.info('User was not logged in - printing landing page.')
+            print(session)
+            return render_template('index.html')
 
 @app.route('/alerts/delete/<int:id>')
 def delete(id):
-    app.logger.info('Deleting Alert with ID: ', id)
+    app.logger.info(f'Deleting Alert with ID: {id}')
     alert = Alert.query.get_or_404(id)
     db.session.delete(alert)
     db.session.commit()
+    print(session)
     # TODO: Do this properly when a way to pass logged user will be
     #       conceptualized
-    # all_alerts = Alert.query.order_by(Alert.date_added).all()
-    return redirect('/')
+    all_alerts = Alert.query.order_by(Alert.date_added).all()
+    return render_template('index.html', alerts=all_alerts, emailuser=session['email'])
+    # return render_template('index.html', emailuser=session['email'])
 
 # TODO: Alert Edit to be handled on the same page,
 #       by changing <p>'s to <inputs> and edit there
 @app.route('/alerts/edit/<int:id>', methods=['GET', 'POST'])
 def edit(id):
-    app.logger.info('Editing Alert with ID: ', id)
+    app.logger.info(f'Editing Alert with ID: {id}')
     alert = Alert.query.get_or_404(id)
 
     if request.method == 'POST':
-        app.logger.info('Edited Alert with ID: ', id)
+        app.logger.info(f'Edited Alert with ID: {id}')
         alert.title = request.form['title']
         alert.author = request.form['author']
         alert.content = request.form['content']
         db.session.commit()
         return redirect('/index.html')
     else:
-        app.logger.info('Rendering Site to Edit Alert with ID: ', id)
+        app.logger.info(f'Rendering Site to Edit Alert with ID: {id}')
         return render_template('edit.html', alert=alert)
 
 @app.route('/alerts/new', methods=['GET', 'POST'])

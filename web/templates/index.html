@@ -66,7 +66,8 @@
             <input class="btn btn-outline-primary" href='/alerts' style="float: right;" type='submit' value='Add New Alert'>
 
             <!-- TODO: Logged User value handling -->
-            <input class="form-control" type="text" name='currentuser' id='currentuser' value="{{ emailuser }}" style="visibility: hidden; height: 0px;">
+            <!-- DONE. Keeping it just in-case for some time. -->
+            <!-- <input class="form-control" type="text" name='currentuser' id='currentuser' value="{{ emailuser }}" style="visibility: hidden; height: 0px;"> -->
             <br>
         </form>
 
@@ -152,10 +153,22 @@
                 <div class="row">
                     <input class="btn btn-outline-primary" formaction="/login" href='/login' type="submit" value="Login" style="margin-right: 10px;" />
                     <input class="btn btn-outline-primary" formaction="/register" href='/register' type="submit" value="Sign Up" />
-                    <input type="checkbox" class="form-check-input" id="remember">
+                    <input type="checkbox" class="form-check-input" name="remember" id="remember" value=False onchange="selectionChanged(this)">
                     <label class="form-check-label text-nowrap" style="font-size: 20px; margin-top: 5px;" for="remember">Remember me</label>
                 </div>
             </div>
         </form>
+
+        <!-- This is to retrieve button checkbox value -->
+        <script>
+            function selectionChanged(element) {
+                console.log(element)
+                if (element.checked) {
+                    element.value = "True"
+                } else {
+                    element.value = "False"
+                }
+            }
+        </script>
     {% endif %}
 {% endblock %}
