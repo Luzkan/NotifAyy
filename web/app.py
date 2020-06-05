@@ -210,23 +210,18 @@ def delete(id):
     db.session.commit()
     return redirect('/index.html')
 
-# TODO: Alert Edit to be handled on the same page,
-#       by changing <p>'s to <inputs> and edit there
+# Edits are now SO SMOOTH - edited by editing it directly on the index site
 @app.route('/alerts/edit/<int:id>', methods=['GET', 'POST'])
 def edit(id):
-    app.logger.info(f'Editing Alert with ID: {id}')
+    app.logger.info(f'Trying to edit Alert with ID: {id}')
     alert = Alert.query.get_or_404(id)
-
     if request.method == 'POST':
-        app.logger.info(f'Edited Alert with ID: {id}')
         alert.title = request.form['title']
-        alert.author = request.form['author']
-        alert.content = request.form['content']
+        alert.page = request.form['page']
         db.session.commit()
-        return redirect('/index.html')
-    else:
-        app.logger.info(f'Rendering Site to Edit Alert with ID: {id}')
-        return render_template('edit.html', alert=alert)
+        app.logger.info(f'Edited Alert with ID: {id}')
+
+    return redirect('/index.html')
 
 @app.route('/alerts/new', methods=['GET', 'POST'])
 def new_alert():

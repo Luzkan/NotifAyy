@@ -78,7 +78,7 @@
                     <div class="input-group-prepend">
                       <span class="input-group-text" id="basic-addon1">Your Facebook Page:</span>
                     </div>
-                    <input type="text" class="form-control" placeholder="facebook.com/notiff.ayy" aria-label="Username" style="margin-right: 10px;" aria-describedby="basic-addon1">
+                    <input type="text" class="form-control" placeholder="facebook.com/notiff.ayy" aria-label="Username" style="margin-right: 10px;">
                     <button type="button" id="connect_button_m" class="btn btn-outline-success">Connect</button>
                 </div>
             </div>
@@ -90,7 +90,7 @@
                     <div class="input-group-prepend">
                       <span class="input-group-text" id="basic-addon1">Your Discord Name:</span>
                     </div>
-                    <input type="text" class="form-control" placeholder="Notifayy#2934" aria-label="Username" style="margin-right: 10px;" aria-describedby="basic-addon1">
+                    <input type="text" class="form-control" placeholder="Notifayy#2934" aria-label="Username" style="margin-right: 10px;">
                     <button type="button" id="connect_button_d" class="btn btn-outline-success">Connect</button>
                 </div>
             </div>
@@ -102,7 +102,7 @@
                     <div class="input-group-prepend">
                       <span class="input-group-text" id="basic-addon1">Your Telegram Name:</span>
                     </div>
-                    <input type="text" class="form-control" placeholder="Notifayy#1337" aria-label="Username" style="margin-right: 10px;" aria-describedby="basic-addon1">
+                    <input type="text" class="form-control" placeholder="Notifayy#1337" aria-label="Username" style="margin-right: 10px;">
                     <button type="button" id="connect_button_t" class="btn btn-outline-success">Connect</button>
                 </div>
             </div>
@@ -111,24 +111,55 @@
         <!-- All Alerts -->
         <hr>
         {% for alert in alerts %}
+        <form action='/alerts/edit/{{alert.id}}' method='POST' style="margin: 0 0 0 0;">
             <div class="container-fluid">
-                <h3>{{ alert.title }}
-                <a class="btn btn-outline-danger" href='/alerts/delete/{{alert.id}}' style="width: 80px; float: right; margin-right: 0px;">Delete</a> 
-                <a class="btn btn-outline-primary" href='/alerts/edit/{{alert.id}}' style="width: 80px; float: right; margin-right: 5px;">Edit</a>
+                <h3><span contenteditable="true" class='t-{{alert.id}}'>{{ alert.title }}</span>
+                <a class="btn btn-outline-danger" formaction='/alerts/delete/{{alert.id}}' type="submit" href='/alerts/delete/{{alert.id}}' style="width: 80px; float: right; margin-right: 0px;">Delete</a> 
+                <a class="btn btn-outline-primary" onclick="edit_alert_{{alert.id}}()" href='#' style="width: 80px; float: right; margin-right: 5px;">Edit</a>
 
                 <!-- Here are the icons for devices where the app will ping if change was found -->
-                <a class="btn btn-outline-dark fab fa-telegram" aria-pressed="false" style="float: right; margin-right: 15px;" disabled="true"></a>
-                <a class="btn btn-outline-dark fab fa-discord" aria-pressed="false" style="float: right; margin-right: 5px;" disabled="true"></a>
-                <a class="btn btn-outline-dark fas fa-comment" aria-pressed="false" style="float: right; margin-right: 5px;" disabled="true"></a>
+                <a class="btn btn-outline-dark fab fa-telegram" data-toggle="button" checked style="float: right; margin-right: 15px;"></a>
+                <a class="btn btn-outline-dark fab fa-discord" data-toggle="button" style="float: right; margin-right: 5px;"></a>
+                <a class="btn btn-outline-dark fas fa-comment" data-toggle="button" style="float: right; margin-right: 5px;"></a>
                 </h3>
             </div>
             <div class="container-fluid" style="font-size: 0.65em; margin-top: 10px; ">
-                <p>Site: {{ alert.page }} <small style="float: right;"> Added on: {{ alert.date_added }}</small> </p>
+                <p>Site: <span contenteditable="true" class='p-{{alert.id}}'>{{ alert.page }}</span> <small style="float: right;"> Added on: {{ alert.date_added }}</small> </p>
             </div>
-
             <hr>
+            <!-- This is to live-edit alert informations -->
+            <script>
+                function edit_alert_{{alert.id}}(){
+                    var g_title = $(".t-{{alert.id}}").text()
+                    var g_page = $(".p-{{alert.id}}").text()
+                    edit_alert('/alerts/edit/{{alert.id}}', {title: g_title, page: g_page})
+                }
+            </script>
             <br>
+        </form>
+
         {% endfor %}
+
+
+    <script>
+        // That's the way I figured out to make that ambitous plan to edit on site possible
+        function edit_alert(path, params, method='POST') {
+            const form = document.createElement('form');
+            form.method = method;
+            form.action = path;
+            for (const key in params) {
+                if (params.hasOwnProperty(key)) {
+                    const hiddenField = document.createElement('input');
+                    hiddenField.type = 'hidden';
+                    hiddenField.name = key;
+                    hiddenField.value = params[key];
+                    form.appendChild(hiddenField);
+                }
+            }
+            document.body.appendChild(form);
+            form.submit();
+        }
+    </script>
 
     <!-- User is not logged in (is on landing page) -->
     {% else %}
@@ -159,8 +190,9 @@
             </div>
         </form>
 
-        <!-- This is to retrieve button checkbox value -->
+        
         <script>
+            // This is to retrieve button checkbox value
             function selectionChanged(element) {
                 console.log(element)
                 if (element.checked) {
