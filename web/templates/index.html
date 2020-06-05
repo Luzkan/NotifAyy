@@ -142,21 +142,21 @@
 
                 <!-- Here are the icons for devices where the app will ping if change was found -->
                 {% if alert.telegram %}
-                    <a class="btn btn-outline-dark fab fa-telegram active" data-toggle="button" style="float: right; margin-right: 15px;"></a>
+                    <a class="btn btn-outline-dark fab fa-telegram active" id="tel-{{alert.id}}" data-toggle="button" aria-pressed="true" style="float: right; margin-right: 15px;"></a>
                 {% else %}
-                    <a class="btn btn-outline-dark fab fa-telegram" data-toggle="button" style="float: right; margin-right: 15px;"></a>
+                    <a class="btn btn-outline-dark fab fa-telegram" id="tel-{{alert.id}}" data-toggle="button" aria-pressed="false" style="float: right; margin-right: 15px;"></a>
                 {% endif %}
 
                 {% if alert.discord %}
-                    <a class="btn btn-outline-dark fab fa-discord active" data-toggle="button" style="float: right; margin-right: 5px;"></a>
+                    <a class="btn btn-outline-dark fab fa-discord active" id="dis-{{alert.id}}" data-toggle="button" aria-pressed="true" style="float: right; margin-right: 5px;"></a>
                 {% else %}
-                    <a class="btn btn-outline-dark fab fa-discord" data-toggle="button" style="float: right; margin-right: 5px;"></a>
+                    <a class="btn btn-outline-dark fab fa-discord" id="dis-{{alert.id}}" data-toggle="button" aria-pressed="false" style="float: right; margin-right: 5px;"></a>
                 {% endif %}
 
                 {% if alert.messenger %}
-                    <a class="btn btn-outline-dark fas fa-comment active" data-toggle="button" style="float: right; margin-right: 5px;"></a>
+                    <a class="btn btn-outline-dark fas fa-comment active" id="mes-{{alert.id}}" data-toggle="button" aria-pressed="true" style="float: right; margin-right: 5px;"></a>
                 {% else %}
-                    <a class="btn btn-outline-dark fas fa-comment" data-toggle="button" style="float: right; margin-right: 5px;"></a>
+                    <a class="btn btn-outline-dark fas fa-comment" id="mes-{{alert.id}}" data-toggle="button" aria-pressed="false" style="float: right; margin-right: 5px;"></a>
                 {% endif %}
 
 
@@ -176,7 +176,10 @@
             function edit_alert(alert_id){
                 var g_title = $(".t-"+alert_id).text()
                 var g_page = $(".p-"+alert_id).text()
-                send_form('/alerts/edit/'+alert_id, {title: g_title, page: g_page})
+                var g_discord = cap($("#dis-"+alert_id).attr('aria-pressed'));
+                var g_messenger = cap($("#mes-"+alert_id).attr('aria-pressed'));
+                var g_telegram = cap($("#tel-"+alert_id).attr('aria-pressed'));
+                send_form('/alerts/edit/'+alert_id, {title: g_title, page: g_page, discord: g_discord, messenger: g_messenger, telegram: g_telegram})
             }
         </script>
 

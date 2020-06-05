@@ -182,13 +182,7 @@ def login_post():
 @app.route('/')
 def index():
     app.logger.info('Landing Page Visited.')
-    if session["remember_me"]:
-        app.logger.info('User was logged in - printing his site.')
-        all_alerts = get_alerts()
-        return render_template('index.html', alerts=all_alerts, emailuser=session['email'])
-    else:
-        app.logger.info('User was not logged in - printing landing page.')
-        return render_template('index.html')
+    return remember_me_handle()
 
 def get_bool(string):
     if string == "True" or string == "true":
@@ -238,9 +232,14 @@ def delete(id):
 def edit(id):
     app.logger.info(f'Trying to edit Alert with ID: {id}')
     alert = Alert.query.get_or_404(id)
+    apps = Apps.query.get_or_404(alert.apps_id)
     if request.method == 'POST':
+        app.logger.info(f'Editing Alert with ID: {id}')
         alert.title = request.form['title']
         alert.page = request.form['page']
+        apps.messenger = get_bool(request.form['messenger'])
+        apps.telegram = get_bool(request.form['telegram'])
+        apps.discord = get_bool(request.form['discord'])
         db.session.commit()
         app.logger.info(f'Edited Alert with ID: {id}')
 
@@ -256,7 +255,6 @@ def new_alert():
         db.session.add(new_alert)
         db.session.commit()
         return redirect('/index.html')
-
 
 @app.route('/index.html', methods=['GET', 'POST'])
 def go_home():
