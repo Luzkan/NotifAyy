@@ -1,3 +1,4 @@
+import logging
 from flask import Flask, render_template, request, redirect, flash
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, LoginManager, login_user
@@ -18,6 +19,9 @@ from passlib.hash import sha256_crypt
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'xDDDDsupresikretKEy'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///notifayy.db'
+# This is for the FSADeprecationWarning (adds significant overhead)
+# and willl be disabled by default in the future anyway
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False 
 db = SQLAlchemy(app)
 
 login_manager = LoginManager()
@@ -63,7 +67,11 @@ class User(UserMixin, db.Model):
 
 @app.route('/register', methods=['GET', 'POST'])
 def auth():
+
+    app.logger.info('Registration Button pressed.')
     if request.method == 'POST':
+
+        app.logger.info('Method: POST')
         user_email = request.form['email']
         user_password = request.form['password']
 
@@ -76,7 +84,7 @@ def auth():
             return redirect('/index.html')
 
         # Hashing the Password
-        password_hashed = sha256_crypt.encrypt(user_password)
+        password_hashed = sha256_crypt.hash(user_password)
         new_user = User(email=user_email, password=password_hashed)
 
         # Add new user to DB
@@ -85,13 +93,19 @@ def auth():
 
         return redirect('/index.html')
     else:
+
+        app.logger.info('Method: NOT POST')
         all_alerts = Alert.query.order_by(Alert.date_added).all()
         all_users = User.query.order_by(User.id).all()
         return render_template('index.html', alerts=all_alerts, users=all_users)
 
 @app.route('/login', methods=['POST'])
 def login_post():
+
+    app.logger.info('Login Button Pressed.')
     if request.method == 'POST':
+
+        app.logger.info('Method: POST')
         user_email = request.form.get('email')
         user_password = request.form.get('password')
 
@@ -101,7 +115,7 @@ def login_post():
         user = User.query.filter_by(email=user_email).first()
 
         # Hash password and check it with the one in db (which was hashed on registration)
-        password_hashed = sha256_crypt.encrypt(user_password)
+        password_hashed = sha256_crypt.hash(user_password)
         if not user or not (sha256_crypt.verify(user.password, password_hashed)):
             flash('Please check your login details and try again.')
             return redirect('/index.html') 
@@ -143,7 +157,9 @@ def index():
 @app.route('/alerts', methods=['GET', 'POST'])
 def alerts():
     alert_user = request.form['currentuser']
+    app.logger.info('Requesting Alerts.')
     if request.method == 'POST':
+        app.logger.info('Adding New Alert.')
         alert_title = request.form['title']
         alert_page = request.form['page']
         new_alert = Alert(title=alert_title, page=alert_page)
@@ -152,11 +168,13 @@ def alerts():
         all_alerts = Alert.query.order_by(Alert.date_added).all()
         return render_template('index.html', alerts=all_alerts, emailuser=alert_user)
     else:
+        app.logger.info('Requesting All Alerts.')
         all_alerts = Alert.query.order_by(Alert.date_added).all()
         return render_template('index.html', alerts=all_alerts)
 
 @app.route('/alerts/delete/<int:id>')
 def delete(id):
+    app.logger.info('Deleting Alert with ID: ', id)
     alert = Alert.query.get_or_404(id)
     db.session.delete(alert)
     db.session.commit()
@@ -169,19 +187,23 @@ def delete(id):
 #       by changing <p>'s to <inputs> and edit there
 @app.route('/alerts/edit/<int:id>', methods=['GET', 'POST'])
 def edit(id):
+    app.logger.info('Editing Alert with ID: ', id)
     alert = Alert.query.get_or_404(id)
 
     if request.method == 'POST':
+        app.logger.info('Edited Alert with ID: ', id)
         alert.title = request.form['title']
         alert.author = request.form['author']
         alert.content = request.form['content']
         db.session.commit()
         return redirect('/index.html')
     else:
+        app.logger.info('Rendering Site to Edit Alert with ID: ', id)
         return render_template('edit.html', alert=alert)
 
 @app.route('/alerts/new', methods=['GET', 'POST'])
 def new_alert():
+    app.logger.info('Adding New Alert.')
     if request.method == 'POST':
         alert.title = request.form['title']
         alert.page = request.form['page']

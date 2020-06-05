@@ -6,7 +6,11 @@
     <br>
 {% block body %}
 
+
+    <!-- User is logged in -->
     {% if emailuser %}
+
+        <!-- Title -->
         <main role="main">
             <div>
                 <div class="col-sm-8 mx-auto">
@@ -19,6 +23,7 @@
             </div>
         </main>
 
+        <!-- New Alerts (at the very top) -->
         <h2 class="mx-auto">Create New Alert:</h2>
         <form action='/alerts' method='POST'>
             <div class="input-group">
@@ -65,7 +70,7 @@
             <br>
         </form>
 
-        <!-- This is the pop-up that appears after pressing "connect your apps" -->
+        <!-- These are the additional divs that appears after pressing wheel right to the messenging app button -->
         <div class="collapse" id="collapseMessenger">
             <div class="container-fluid">
                 <div class="input-group mb-3">
@@ -102,12 +107,14 @@
             </div>
         </div>
 
+        <!-- All Alerts -->
         <hr>
         {% for alert in alerts %}
             <div class="container-fluid">
                 <h3>{{ alert.title }}
                 <a class="btn btn-outline-danger" href='/alerts/delete/{{alert.id}}' style="width: 80px; float: right; margin-right: 0px;">Delete</a> 
                 <a class="btn btn-outline-primary" href='/alerts/edit/{{alert.id}}' style="width: 80px; float: right; margin-right: 5px;">Edit</a>
+
                 <!-- Here are the icons for devices where the app will ping if change was found -->
                 <a class="btn btn-outline-dark fab fa-telegram" aria-pressed="false" style="float: right; margin-right: 15px;" disabled="true"></a>
                 <a class="btn btn-outline-dark fab fa-discord" aria-pressed="false" style="float: right; margin-right: 5px;" disabled="true"></a>
@@ -122,6 +129,7 @@
             <br>
         {% endfor %}
 
+    <!-- User is not logged in (is on landing page) -->
     {% else %}
         <header id="header">
             <h1>NotifAyy</h1>
@@ -140,23 +148,14 @@
             <input type="email" name="email" id="email" placeholder="Email Address" />
             <input type="password" name="password" id="password" placeholder="Password" />
 
-
             <div class="container">
                 <div class="row">
                     <input class="btn btn-outline-primary" href='/login' type="submit" value="Login" style="margin-right: 10px;" />
                     <input class="btn btn-outline-primary" href='/register' type="submit" value="Sign Up" />
-                    
-                  
                     <input type="checkbox" class="form-check-input" id="remember">
                     <label class="form-check-label text-nowrap" style="font-size: 20px; margin-top: 5px;" for="remember">Remember me</label>
-                  
                 </div>
             </div>
-
-            <!-- <input class="btn btn-outline-primary" href='/register' type="submit" value="Sign Up" />
-            <input class="btn btn-outline-primary" href='/login' type="submit" value="Login" />
-                <input type="checkbox" class="form-check-input" id="remember">
-                <label class="form-check-label" for="remember"> </label> -->
         </form>
     {% endif %}
 {% endblock %}
