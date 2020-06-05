@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <title>Edit Alert</title> 
+{% endblock %}
+
+{% block body %}
+    <hr>
+    <h2>Edit Alert:</h2>
+    <form action='/alerts/edit/{{alert.id}}' method='POST'>
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="">Webpage URL</span>
+            </div>
+            <input class="form-control" type="text" name='page' id='page' placeholder="youtube.com/youtuber/videos" aria-label="Enter Page">
+        </div>
+        <br>
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="">Alert Title</span>
+            </div>
+            <input class="form-control" type="text" name='title' id='title' placeholder="My Fav Youtuber" aria-label="Enter Title">
+        </div>
+        <br>
+        <input  class="btn btn-outline-primary" style="float: right;" type='submit' value='Finished Editing'>
+        <br>
+    </form>
+    <hr>
+{% endblock %}

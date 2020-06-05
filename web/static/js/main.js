@@ -20,9 +20,9 @@
 		// Lista obrazków oraz czas do zmiany
 		var settings = {
 			images: {
-				'assets/css/tlo01.jpg': 'center',
-				'assets/css/tlo02.jpg': 'center',
-				'assets/css/tlo03.jpg': 'center'
+				'static/css/tlo01.jpg': 'center',
+				'static/css/tlo02.jpg': 'center',
+				'static/css/tlo03.jpg': 'center'
 			},
 			delay: 6000
 		};
@@ -101,21 +101,21 @@
 		};
 
 		// Po kliknięciu buttonsa na rejestracje
-		$form.addEventListener('submit', function(event) {
-			event.stopPropagation();
-			event.preventDefault();
+		// $form.addEventListener('submit', function(event) {
+		// 	event.stopPropagation();
+		// 	event.preventDefault();
 
-			// Schowaj wiadomke na razie i wyłącz buttonsa
-			$message._hide();
-			$submit.disabled = true;
+		// 	// Schowaj wiadomke na razie i wyłącz buttonsa
+		// 	$message._hide();
+		// 	$submit.disabled = true;
 
-			// Przetwórz input formy
-			window.setTimeout(function() {
-					$form.reset();
-					$submit.disabled = false;
-					$message._show('success', 'Everything went cool mate, check your e-mail. ;3');
-					//$message._show('failure', 'Awww, something went wrong ;_;');
-			}, 750);
-		});
+		// 	// Przetwórz input formy
+		// 	window.setTimeout(function() {
+		// 			$form.reset();
+		// 			$submit.disabled = false;
+		// 			$message._show('success', 'Everything went cool mate, check your e-mail. ;3');
+		// 			//$message._show('failure', 'Awww, something went wrong ;_;');
+		// 	}, 750);
+		// });
 	})();
 })();
