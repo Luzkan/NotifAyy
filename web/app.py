@@ -29,8 +29,8 @@ from passlib.hash import sha256_crypt
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'xDDDDsupresikretKEy'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///notifayy.db'
-# This is for the FSADeprecationWarning (adds significant overhead)
-# and willl be disabled by default in the future anyway
+# # Info: This is for the FSADeprecationWarning (adds significant overhead)
+#         and will be disabled by default in the future anyway
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False 
 db = SQLAlchemy(app)
 
@@ -155,9 +155,9 @@ def index():
     if request.method == 'POST':
         app.logger.debug('Landing Page Visited with method POST')
         # Creating App Alert
-        messenger_bool = request.form['messenger']
-        telegram_bool = request.form['telegram']
-        discord_bool = request.form['discord']
+        messenger_bool = get_bool(request.form['messenger'])
+        telegram_bool = get_bool(request.form['telegram'])
+        discord_bool = get_bool(request.form['discord'])
         new_apps_bool = Apps(discord=discord_bool, telegram=telegram_bool, messenger=messenger_bool)
 
         # First we add the app alert, then flush to retrieve it's unique ID
@@ -167,7 +167,7 @@ def index():
         # Creating new Alert
         alert_title = request.form['title']
         alert_page = request.form['page']
-        # TODO: User_ID
+        current_user_id = session["_user_id"]
         apps_bools_id = new_apps_bool.id
         #new_alert = Alert(title=alert_title, page=alert_page, user_id=current_user_id, apps_id=apps_bools_id)
         new_alert = Alert(title=alert_title, page=alert_page)
@@ -180,16 +180,37 @@ def index():
         all_users = User.query.order_by(User.id).all()
         return render_template('index.html', alerts=all_alerts, users=all_users)
 
+def get_bool(string):
+    if string == "True" or string == "true":
+        return True
+    return False
+
 @app.route('/alerts', methods=['GET', 'POST'])
 def alerts():
     app.logger.info('Requesting Alerts. (/alerts)')
     if request.method == 'POST':
         app.logger.info('Adding New Alert. (/alerts)')
+
+        # Creating App Alert
+        messenger_bool = get_bool(request.form['messenger'])
+        telegram_bool = get_bool(request.form['telegram'])
+        discord_bool = get_bool(request.form['discord'])
+        new_apps_bool = Apps(discord=discord_bool, telegram=telegram_bool, messenger=messenger_bool)
+
+        # First we add the app alert, then flush to retrieve it's unique ID
+        db.session.add(new_apps_bool)
+        db.session.flush()
+
+        # Creating new Alert
         alert_title = request.form['title']
         alert_page = request.form['page']
+        current_user_id = session["_user_id"]
+        apps_bools_id = new_apps_bool.id
+        #new_alert = Alert(title=alert_title, page=alert_page, user_id=current_user_id, apps_id=apps_bools_id)
         new_alert = Alert(title=alert_title, page=alert_page)
         db.session.add(new_alert)
         db.session.commit()
+
         all_alerts = Alert.query.order_by(Alert.date_added).all()
         return render_template('index.html', alerts=all_alerts, emailuser=session['email'])
     else:
