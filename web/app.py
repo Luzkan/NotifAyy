@@ -253,17 +253,6 @@ def edit(id):
 
     return redirect('/index.html')
 
-@app.route('/alerts/new', methods=['GET', 'POST'])
-def new_alert():
-    app.logger.info('Adding New Alert (/alerts/new).')
-    if request.method == 'POST':
-        alert.title = request.form['title']
-        alert.page = request.form['page']
-        new_alert = Alert(title=alert_title, page=alert_page)
-        db.session.add(new_alert)
-        db.session.commit()
-        return redirect('/index.html')
-
 @app.route('/index.html', methods=['GET', 'POST'])
 def go_home():
     all_alerts = get_alerts()
