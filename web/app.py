@@ -4,9 +4,12 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, LoginManager, login_user
 from datetime import datetime
 from passlib.hash import sha256_crypt
-# pip install passlib (507kb, guys)
+
 
 # ===== Notice Info 04-06-2020 
+#   First of all, password encryption was added, so:
+#   > pip install passlib (507kb, guys)
+#
 #   Keep in mind that expanding on existing models in DB
 #   Will caues error due to unexisting columns, so:
 #   Navigate to ./web (here's the app.py)
@@ -15,6 +18,13 @@ from passlib.hash import sha256_crypt
 #   > db.reflect()
 #   > db.drop_all()
 #   > db.create_all()
+
+# ===== Notice Info 05-06-2020 
+#   To surprass all these annoying false-positive warnings with
+#   db.* and logger.*, just do this:
+#   > pip install pylint-flask (10 KB)
+#   Then in .vscode/settings.json (if you are using vscode), add:
+#   > "python.linting.pylintArgs": ["--load-plugins", "pylint-flask"]
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'xDDDDsupresikretKEy'
@@ -81,8 +91,10 @@ def auth():
         # If user doesn't exist, redirect back
         if user: 
             flash('Email address already exists')
+            app.logger.warn("Email adress already exist in the database.")
             return redirect('/index.html')
 
+        app.logger.info("Succesfully added new user to database.")
         # Hashing the Password
         password_hashed = sha256_crypt.hash(user_password)
         new_user = User(email=user_email, password=password_hashed)
@@ -101,26 +113,32 @@ def auth():
 
 @app.route('/login', methods=['POST'])
 def login_post():
-
     app.logger.info('Login Button Pressed.')
     if request.method == 'POST':
 
         app.logger.info('Method: POST')
         user_email = request.form.get('email')
         user_password = request.form.get('password')
-
-        # TODO: Remember me checkbox in login form
-        # remember = True if request.form.get('remember') else False
+        remember = request.form.get('remember')
 
         user = User.query.filter_by(email=user_email).first()
 
         # Hash password and check it with the one in db (which was hashed on registration)
         password_hashed = sha256_crypt.hash(user_password)
+
+        # --- Debugging Passwords check
+        app.logger.debug("Passwords: (input: " + password_hashed + ", db: " + user.password + ")")
+        res = (sha256_crypt.verify(user.password, password_hashed))
+        app.logger.debug("Result of pass check: " + str(res))
+        # ---
+
         if not user or not (sha256_crypt.verify(user.password, password_hashed)):
             flash('Please check your login details and try again.')
-            return redirect('/index.html') 
+            app.logger.warn("Wrong Credentials / User doesn't exist" + user_email)
+            return redirect('/') 
 
-        login_user(user, remember=True)
+        app.logger.info("Succesfully logged in user: " + user_email)
+        login_user(user, remember=remember)
         all_alerts = Alert.query.order_by(Alert.date_added).all()
         return render_template('index.html', alerts=all_alerts, emailuser=user_email)
 
