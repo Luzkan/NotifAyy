@@ -39,7 +39,9 @@ async def changes():
     while True:
         try:
             for member in members:
-                response = requests.get(url + '/changes', params={'discordId': member.id})
+                if member == client.user:
+                    continue
+                response = requests.get(url + '/changes', params={'discordId': member.id}).json()
                 if response is not None and response['change'] is not None:
                     await member.create_dm()
                     await member.dm_channel.send(
@@ -52,8 +54,8 @@ async def changes():
         except requests.exceptions.RequestException as err:
             print(err)
 
-        except TypeError:
-            print('idk')
+        except TypeError as err:
+            print(err)
 
         time.sleep(15)
 

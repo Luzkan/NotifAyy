@@ -1,5 +1,5 @@
 import logging
-from flask import Flask, render_template, request, redirect, flash, session
+from flask import Flask, render_template, request, redirect, flash, session, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, LoginManager, login_user, logout_user
 from datetime import datetime
@@ -67,6 +67,15 @@ def get_alerts():
         alert.messenger = all_apps[alert.id].messenger
         alert.discord = all_apps[alert.id].discord
         alert.telegram = all_apps[alert.id].telegram
+
+    return all_alerts
+
+def get_alerts_by_id(discordId: str):
+    all_alerts = Alert.query.filter_by(user_id=discordId).order_by(Alert.date_added).all()
+    all_apps = get_apps(all_alerts)
+
+    for alert in all_alerts:
+        alert.discord = all_apps[alert.id].discord
 
     return all_alerts
 
@@ -262,6 +271,12 @@ def go_home():
 def logout():
     logout_user()
     return redirect('/')
+
+@app.route('/changes', methods=['GET'])
+def chages():
+    print(request.args.get('discordId'))
+    return jsonify({"change": "change 1"})
+
 
 if __name__ == "__main__":
     app.run(debug=True)
