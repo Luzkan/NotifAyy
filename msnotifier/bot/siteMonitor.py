@@ -35,22 +35,31 @@ def split_content_by_tags(html: str, tags: List[str]) -> List[List[str]]:
     return [soup.find_all(tag) for tag in tags]
 
 
-def example_usage(url: str, t: float) -> None:
-    tags = ["a", "h1", "h2", "p"]
-    while True:
-        x = split_content_by_tags(get_content(url), tags)
-        time.sleep(t)
-        y = split_content_by_tags(get_content(url), tags)
-
-        z = compare_content_by_tags(x,y)
-        for i in range(len(tags)):
-            for elem in z[i]:
-                print("BEFORE:", elem[0])
-                print("AFTER:", elem[1])
+def get_diffs(tags: List[str], addresses: List[str], t: float) -> list:
+    before = [split_content_by_tags(get_content(url), tags) for url in addresses]
+    time.sleep(t)
+    after = [split_content_by_tags(get_content(url), tags) for url in addresses]
+    comparison_lst = []
+    for i in range(len(before)):
+        comparison_lst.append(compare_content_by_tags(before[i], after[i]))
+    return comparison_lst
 
 
+"""
+For each website there are tag_diffs, which are tuples of content with the tag before and after
+Example print for data below:
+[]
+[]
+[(<h1 class="ywentc-1 gSKBNp"><a class="sc-1opjz2c-0 hJbLrA" href="https://wiadomosci.wp.pl/">
+Tym żyje Polska <span class="ywentc-5 ciJuja">
+</span></a></h1>, None)]
+[]
+It means that mediamond.fi webpage didn't have any h1, h2 differences,
+while wp.pl had differences in h1, in that case there was one item with h1 tag, and afterwards None of them. 
+"""
 if __name__ == "__main__":
-    # obserwacja stronki co 15 sekund
     time_seconds = 15
-    website = "http://www.mediamond.fi/"
-    example_usage(website, time_seconds)
+    addresses = ["http://www.mediamond.fi", "https://wp.pl"]
+    for elem in get_diffs(["h1", "h2"], addresses, time_seconds):
+        for tag_diff in elem:
+            print(tag_diff)
