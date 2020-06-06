@@ -19,11 +19,15 @@
 
     <footer id="footer">
         <ul class="icons">
-            <li><a href="https://github.com/Luzkan/MessengerNotifier/" class="icon brands fa-github"><span class="label">GitHub</span></a></li>
+            <li><a href="https://github.com/Luzkan/NotifAyy/" class="icon brands fa-github"><span class="label">GitHub</span></a></li>
             <li><a href="#" class="icon fa-envelope"><span class="label">Email</span></a></li>
         </ul>
         <ul class="copyright">
-            <li>&copy; NotifAyy.</li><li>Credits: <a href="https://github.com/Luzkan/MessengerNotifier/">GitHub Project Team :*</a></li>
+            <li>&copy; NotifAyy.</li>
+            <li>Credits: <a href="https://github.com/Luzkan/NotifAyy/">GitHub Project Team :*</a></li>
+            {% if emailuser %}
+                <li><a href="/logout">Logout</a></li>
+            {% endif %}
         </ul>
     </footer>
 
@@ -37,6 +41,28 @@
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
         crossorigin="anonymous"></script>
     <script src="static/js/main.js"></script>
+
+    
+    <script>
+        // Adding simple spinning circle after pressing connect (on apps connecting buttons)
+        // Separting stuff that'll happen after pressing each of them if you guys would like to
+        // Add some JS to the connection functionality
+        $(document).ready(function() {
+            $("#connect_button_d").click(function() {
+                $(this).prop("disabled", true);
+                $(this).html(`<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Connecting` );
+            });
+            $("#connect_button_m").click(function() {
+                $(this).prop("disabled", true);
+                $(this).html(`<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Connecting` );
+            });
+            $("#connect_button_t").click(function() {
+                $(this).prop("disabled", true);
+                $(this).html(`<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Connecting` );
+            });
+        });
+    </script>
+
 </body>
 
 
