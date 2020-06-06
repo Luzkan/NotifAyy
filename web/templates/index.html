@@ -1,0 +1,261 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    <title>Home</title>
+{% endblock %}
+    <br>
+{% block body %}
+
+    
+
+    
+    <!-- User is logged in -->
+    {% if emailuser %}
+        <!-- Title -->
+        <main role="main">
+            <div>
+                <div class="col-sm-8 mx-auto">
+                    <br>
+                    <header id="header">
+                        <h2>Hello, {{ emailuser }}!</h2>
+                        <p class="text-nowrap bd-highlight">No worries, NotifAyy will check stuff for you!</p> 
+                    </header>                                        
+                </div>
+            </div>
+        </main>
+
+        <!-- New Alerts (at the very top) -->
+        <h2 class="mx-auto">Create New Alert:</h2>
+        <form action='/alerts' method='POST'>
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="">Webpage URL</span>
+                </div>
+                <input class="form-control title_new" type="text" name='page' id='page_new' placeholder="youtube.com/youtuber/videos" aria-label="Enter Page">
+            </div>
+            <br>
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="">Alert Title</span>
+                </div>
+                <input class="form-control page_new" type="text" name='title' id='title_new' placeholder="My Fav Youtuber" aria-label="Enter Title">
+            </div>
+            <br>
+            
+            <!-- App Buttons Booleans -->
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-outline-dark" name='messenger' id='messenger_new' data-toggle="button" aria-pressed="false" autocomplete="off">
+                    Messenger
+                </button>
+                <button type="button" class="btn btn-outline-dark fas fa-cog" data-toggle="collapse" aria-pressed="false" data-target="#collapseMessenger"></button>
+            </div>
+
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-outline-dark" name='discord' id='discord_new' data-toggle="button" aria-pressed="false" autocomplete="off">
+                    Discord
+                </button>
+                <button type="button" class="btn btn-outline-dark fas fa-cog" data-toggle="collapse" aria-pressed="false" data-target="#collapseDiscord"></button>
+            </div>
+
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-outline-dark" name='telegram' id='telegram_new' data-toggle="button" aria-pressed="false" autocomplete="off">
+                    Telegram
+                </button>
+                <button type="button" class="btn btn-outline-dark fas fa-cog" data-toggle="collapse" aria-pressed="false" data-target="#collapseTelegram"></button>
+            </div>
+
+            <input class="btn btn-outline-primary" onclick="send_form_new_alert()" href='#' style="float: right;" value='Add New Alert'>
+
+            <script>
+                function send_form_new_alert(){
+                    var g_title = $("#title_new").val();
+                    var g_page = $("#page_new").val();
+                    var g_discord = cap($("#discord_new").attr('aria-pressed'));
+                    var g_messenger = cap($("#messenger_new").attr('aria-pressed'));
+                    var g_telegram = cap($("#telegram_new").attr('aria-pressed'));
+                    send_form('/alerts', {title: g_title, page: g_page, discord: g_discord, messenger: g_messenger, telegram: g_telegram})
+                }
+                
+                // First Letter to uppercase
+                function cap(string) {
+                    return string.charAt(0).toUpperCase() + string.slice(1);
+                }
+
+                // Gets Boolean
+                function get_bool(string){
+                    return (string === 'true');
+                }
+
+            </script>
+
+            <!-- TODO: Logged User value handling -->
+            <!-- DONE. Keeping it just in-case for some time. -->
+            <!-- <input class="form-control" type="text" name='currentuser' id='currentuser' value="{{ emailuser }}" style="visibility: hidden; height: 0px;"> -->
+            <br>
+        </form>
+
+        <!-- These are the additional divs that appears after pressing wheel right to the messenging app button -->
+        <div class="collapse" id="collapseMessenger">
+            <div class="container-fluid">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text" id="basic-addon1">Your Facebook Page:</span>
+                    </div>
+                    <input type="text" class="form-control" placeholder="facebook.com/notiff.ayy" aria-label="Username" style="margin-right: 10px;">
+                    <button type="button" id="connect_button_m" class="btn btn-outline-success">Connect</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="collapse" id="collapseDiscord">
+            <div class="container-fluid">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text" id="basic-addon1">Your Discord Name:</span>
+                    </div>
+                    <input type="text" class="form-control" placeholder="Notifayy#2934" aria-label="Username" style="margin-right: 10px;">
+                    <button type="button" id="connect_button_d" class="btn btn-outline-success">Connect</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="collapse" id="collapseTelegram">
+            <div class="container-fluid">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text" id="basic-addon1">Your Telegram Name:</span>
+                    </div>
+                    <input type="text" class="form-control" placeholder="Notifayy#1337" aria-label="Username" style="margin-right: 10px;">
+                    <button type="button" id="connect_button_t" class="btn btn-outline-success">Connect</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- All Alerts -->
+        <hr>
+        {% for alert in alerts %}
+        <form action='/alerts/edit/{{alert.id}}' method='POST' style="margin: 0 0 0 0;">
+            <div class="container-fluid">
+                <h3><span contenteditable="true" class='t-{{alert.id}}'>{{ alert.title }}</span>
+                <a class="btn btn-outline-danger" formaction='/alerts/delete/{{alert.id}}' type="submit" href='/alerts/delete/{{alert.id}}' style="width: 80px; float: right; margin-right: 0px;">Delete</a> 
+                <a class="btn btn-outline-primary" onclick="edit_alert({{alert.id}})" href='#' style="width: 80px; float: right; margin-right: 5px;">Edit</a>
+
+                <!-- Here are the icons for devices where the app will ping if change was found -->
+                {% if alert.telegram %}
+                    <a class="btn btn-outline-dark fab fa-telegram active" id="tel-{{alert.id}}" data-toggle="button" aria-pressed="true" style="float: right; margin-right: 15px;"></a>
+                {% else %}
+                    <a class="btn btn-outline-dark fab fa-telegram" id="tel-{{alert.id}}" data-toggle="button" aria-pressed="false" style="float: right; margin-right: 15px;"></a>
+                {% endif %}
+
+                {% if alert.discord %}
+                    <a class="btn btn-outline-dark fab fa-discord active" id="dis-{{alert.id}}" data-toggle="button" aria-pressed="true" style="float: right; margin-right: 5px;"></a>
+                {% else %}
+                    <a class="btn btn-outline-dark fab fa-discord" id="dis-{{alert.id}}" data-toggle="button" aria-pressed="false" style="float: right; margin-right: 5px;"></a>
+                {% endif %}
+
+                {% if alert.messenger %}
+                    <a class="btn btn-outline-dark fas fa-comment active" id="mes-{{alert.id}}" data-toggle="button" aria-pressed="true" style="float: right; margin-right: 5px;"></a>
+                {% else %}
+                    <a class="btn btn-outline-dark fas fa-comment" id="mes-{{alert.id}}" data-toggle="button" aria-pressed="false" style="float: right; margin-right: 5px;"></a>
+                {% endif %}
+
+
+                </h3>
+            </div>
+            <div class="container-fluid" style="font-size: 0.65em; margin-top: 10px; ">
+                <p>Site: <span contenteditable="true" class='p-{{alert.id}}'>{{ alert.page }}</span> <small style="float: right;"> Added on: {{ alert.date_added }}</small> </p>
+            </div>
+            <hr>
+            <!-- This is to live-edit alert informations -->
+            <br>
+        </form>
+
+        {% endfor %}
+
+        <script>
+            function edit_alert(alert_id){
+                var g_title = $(".t-"+alert_id).text()
+                var g_page = $(".p-"+alert_id).text()
+                var g_discord = cap($("#dis-"+alert_id).attr('aria-pressed'));
+                var g_messenger = cap($("#mes-"+alert_id).attr('aria-pressed'));
+                var g_telegram = cap($("#tel-"+alert_id).attr('aria-pressed'));
+                send_form('/alerts/edit/'+alert_id, {title: g_title, page: g_page, discord: g_discord, messenger: g_messenger, telegram: g_telegram})
+            }
+        </script>
+
+        <!-- Changing display dynamically depending on amount of stuff to print -->
+        {% if alerts|length <= 2 %}
+        <style>
+            body {
+                justify-content: center;
+            }
+        </style>
+        {% endif %}
+
+    <script>
+        // That's the way I figured out to make that ambitous plan to edit on site possible
+        function send_form(path, params, method='POST') {
+            const form = document.createElement('form');
+            form.method = method;
+            form.action = path;
+            for (const key in params) {
+                if (params.hasOwnProperty(key)) {
+                    const hiddenField = document.createElement('input');
+                    hiddenField.type = 'hidden';
+                    hiddenField.name = key;
+                    hiddenField.value = params[key];
+                    form.appendChild(hiddenField);
+                }
+            }
+            document.body.appendChild(form);
+            form.submit();
+        }
+    </script>
+
+    <!-- User is not logged in (is on landing page) -->
+    {% else %}
+        <header id="header">
+            <h1>NotifAyy</h1>
+            <p >Get informed when someone post an update anywhere, everywhere.</p> 
+        </header>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="notification is-danger">
+                    <i>{{ messages[0] }}</i>
+                </div>
+            {% endif %}
+        {% endwith %}
+            
+        <form id="signup-form" method="POST" action="/login">
+            <input type="email" name="email" id="email" placeholder="Email Address" />
+            <input type="password" name="password" id="password" placeholder="Password" />
+
+            <div class="container">
+                <div class="row">
+                    <input class="btn btn-outline-primary" formaction="/login" href='/login' type="submit" value="Login" style="margin-right: 10px;" />
+                    <input class="btn btn-outline-primary" formaction="/register" href='/register' type="submit" value="Sign Up" />
+                    <input type="checkbox" class="form-check-input" name="remember" id="remember" value=False onchange="selectionChanged(this)">
+                    <label class="form-check-label text-nowrap" style="font-size: 20px; margin-top: 5px;" for="remember">Remember me</label>
+                </div>
+            </div>
+        </form>
+
+        <style>
+            body {
+                justify-content: center;
+            }
+        </style>
+
+    {% endif %}
+    <script>
+        // This is to retrieve button checkbox value
+        function selectionChanged(element) {
+            if (element.checked) {
+                element.value = "True"
+            } else {
+                element.value = "False"
+            }
+        }
+    </script>
+{% endblock %}
