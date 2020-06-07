@@ -3,6 +3,12 @@ import time
 from bs4 import BeautifulSoup
 from typing import List
 
+class Alert:
+    def __init__(self,adr,user_id):
+        self.adr=adr
+        self.user_id=user_id
+        self.errors=[]
+
 
 def compare_content_by_tags(previous: List[List[str]],
                             current: List[List[str]]) -> List[List[tuple]]:
@@ -35,31 +41,60 @@ def split_content_by_tags(html: str, tags: List[str]) -> List[List[str]]:
     return [soup.find_all(tag) for tag in tags]
 
 
-def get_diffs(tags: List[str], addresses: List[str], t: float) -> list:
-    before = [split_content_by_tags(get_content(url), tags) for url in addresses]
+
+def get_diffs(user_id: int,
+              tags: List[str],
+              alert_ids: List[int],
+              addresses: List[str],
+              t: float) -> tuple:
+
+    before = [(alert_ids[i], split_content_by_tags(get_content(addresses[i]), tags))
+              for i in range(len(addresses))]
+
     time.sleep(t)
-    after = [split_content_by_tags(get_content(url), tags) for url in addresses]
-    comparison_lst = []
-    for i in range(len(before)):
-        comparison_lst.append(compare_content_by_tags(before[i], after[i]))
-    return comparison_lst
+
+    after = [(alert_ids[i], split_content_by_tags(get_content(addresses[i]), tags))
+             for i in range(len(addresses))]
+
+    comparison_lst = [(alert_ids[i], compare_content_by_tags(before[i][1], after[i][1]))
+                      for i in range(len(before))]
+
+    return user_id, comparison_lst
 
 
-"""
-For each website there are tag_diffs, which are tuples of content with the tag before and after
-Example print for data below:
-[]
-[]
-[(<h1 class="ywentc-1 gSKBNp"><a class="sc-1opjz2c-0 hJbLrA" href="https://wiadomosci.wp.pl/">
-Tym żyje Polska <span class="ywentc-5 ciJuja">
-</span></a></h1>, None)]
-[]
-It means that mediamond.fi webpage didn't have any h1, h2 differences,
-while wp.pl had differences in h1, in that case there was one item with h1 tag, and afterwards None of them. 
-"""
+def get_diffs_string_format(diffs: tuple,
+                            titles: List[str],
+                            addresses: List[str],
+                            tags: List[str]) -> None:
+
+    data = [] 
+    id_and_diffs = diffs[1]
+    for i in range(len(id_and_diffs)):
+        alert_number = str(id_and_diffs[i][0])
+        title = titles[i]
+        addr = addresses[i]
+        tag_diffs = id_and_diffs[i][1]
+        tag_diffs_content = ""
+        for h in range(len(tag_diffs)):
+            tag_diffs_content += ("\nTAG ")
+            tag_diffs_content += tags[h]
+            tag_diffs_content += "\n"
+            if tag_diffs[h]:
+                tag_diffs_content += "\nBEFORE:\n"
+                tag_diffs_content += str(tag_diffs[h][0][0])
+                tag_diffs_content += "\nAFTER:\n"
+                tag_diffs_content += str(tag_diffs[h][0][1])
+            else:
+                tag_diffs_content += "No changes\n"
+        data.append((alert_number, title, addr, tag_diffs_content))
+    return data
+
+
 if __name__ == "__main__":
-    time_seconds = 15
-    addresses = ["http://www.mediamond.fi", "https://wp.pl"]
-    for elem in get_diffs(["h1", "h2"], addresses, time_seconds):
-        for tag_diff in elem:
-            print(tag_diff)
+    time_seconds = 3
+    addresses = ["http://www.mediamond.fi", "https://wp.pl", "http://www.mediamond.fi"]
+    tags = ["h1", "h2", "h3", "p"]
+    x = get_diffs(14184148, tags, [1, 2, 3], addresses, time_seconds)
+    for elem in get_diffs_string_format(x, ["Alert 1", "Alert 2", "Alert 3"], addresses, tags):
+        print(elem)
+
