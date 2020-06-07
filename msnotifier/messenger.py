@@ -41,7 +41,7 @@ class fb_chat(Notifier):
         return 1
 
     def message_myself(self, content,web):
-        content= "CHANGE DETECTED ON"+Website+"\n "+content
+        content= "CHANGE DETECTED ON"+web+"\n "+content
         sent = self.client.sendMessage(content, thread_id=self.client.uid, thread_type=ThreadType.USER)
         if sent:
             return 1
