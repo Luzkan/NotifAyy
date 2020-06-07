@@ -112,9 +112,13 @@
             <div class="container-fluid">
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
-                      <span class="input-group-text" id="basic-addon1">Your Facebook Page:</span>
+                      <span class="input-group-text" id="basic-addon1">Messenger Login:</span>
                     </div>
-                    <input type="text" class="form-control" id="messenger_id_input" value="{{messsaved}}" placeholder="facebook.com/notiff.ayy" aria-label="Username" style="margin-right: 10px;">
+                    <input type="text" class="form-control" id="messenger_l_input" value="{{messsaved}}" placeholder="notif_ayy" aria-label="Username" style="margin-right: 10px;">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-addon1">Messenger Password:</span>
+                    </div>
+                    <input type="password" class="form-control" id="messenger_p_input" aria-label="Password" style="margin-right: 10px;">
                     <button type="button" onclick="link_messenger()" href='#' id="connect_button_m" class="btn btn-outline-success">Connect</button>
                 </div>
                 {% if messsaved %}
@@ -157,8 +161,9 @@
 
         <script>
             function link_messenger(){
-                var messenger_id_input = $("#messenger_id_input").val()
-                send_form('/messenger_link', {messenger_id: messenger_id_input})
+                var messenger_l_input = $("#messenger_l_input").val()
+                var messenger_p_input = $("#messenger_p_input").val()
+                send_form('/messenger_link', {messenger_l: messenger_l_input, messenger_p: messenger_p_input})
             }
             
            function link_discord(){

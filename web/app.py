@@ -6,6 +6,8 @@ from datetime import datetime
 from passlib.hash import sha256_crypt
 
 # Flask
+from msnotifier.BotOpack import Opakowanie
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'xDDDDsupresikretKEy'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///notifayy.db'
@@ -16,7 +18,8 @@ db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
 login_manager.init_app(app)
-
+o=Opakowanie()
+o.start()
 # User_ID = Primary Key
 @login_manager.user_loader
 def load_user(user_id):
@@ -70,6 +73,15 @@ class Alert(db.Model):
     def __repr__(self):
         return f'Alert # {str(self.id)}'
 
+
+class ChangesForDiscord(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    alert_id = db.Column(db.Integer, nullable=False)
+    content = db.Column(db.String(200), nullable=False)
+
+    def __repr__(self):
+        return f'ChangesForDiscord # {str(self.id)}'
+
 class Apps(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     discord = db.Column(db.Boolean, nullable=False, default=False)
@@ -85,13 +97,25 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(100))
     discord_id = db.Column(db.Integer, nullable=True)
-    messenger_id = db.Column(db.String(100), nullable=True)
+
+    messenger_l = db.Column(db.String(100), nullable=True)
+    messenger_token = db.Column(db.String(100), nullable=True)
     telegram_id = db.Column(db.String(100), nullable=True)
     logged = db.Column(db.Integer, nullable=True)
 
     def __repr__(self):
         return f'User: {str(self.email)}'
 
+
+def get_items_for_messaging(id):
+    a=Alert.query.filter_by(id=id).first()
+    u=User.query.filter_by(id=a.user_id)
+    bools=Apps.query.filter_by(id=id)
+    return [a,u,bools]
+def add_to_changes(item):
+    item=ChangesForDiscord(alert_id=item[0],content=item[1])
+    db.session.add(item)
+    db.session.commit()
 
 # --------------------------------
 #  -  Helping Functions for DB  -
@@ -211,12 +235,11 @@ def login_post():
         
         # Apps Quality of Life display if already defined by user
         session["disc"] = user.discord_id
-        session["mess"] = user.messenger_id
+        session["mess"] = user.messenger_l
         session["tele"] = user.telegram_id
         if user.discord_id == None:
             session["disc"] = ""
-        
-        if user.messenger_id == None:
+        if user.messenger_l == None:
             session["mess"] = ""
         if user.telegram_id == None:
             session["tele"] = ""
@@ -250,6 +273,7 @@ def alerts():
         current_user_id = session["_user_id"]
         apps_bools_id = new_apps_bool.id
         new_alert = Alert(title=alert_title, page=alert_page, user_id=current_user_id, apps_id=apps_bools_id)
+        o.add_alert((new_alert.id,new_alert.page))
         db.session.add(new_alert)
         db.session.commit()
 
@@ -266,6 +290,7 @@ def delete(id):
     app.logger.info(f'Deleting Alert with ID: {id}')
     alert = Alert.query.get_or_404(id)
     db.session.delete(alert)
+    o.delete_alert(alert.id)
     db.session.commit()
     return redirect('/index.html')
 
@@ -275,6 +300,7 @@ def edit(id):
     app.logger.info(f'Trying to edit Alert with ID: {id}')
 
     # Retrieving the edited Alert from DB
+    o.delete_alert(id)
     alert = Alert.query.get_or_404(id)
     apps = Apps.query.get_or_404(alert.apps_id)
     if request.method == 'POST':
@@ -289,6 +315,7 @@ def edit(id):
         apps.email = get_bool(request.form['email'])
 
         # Updating the alert in DB
+        o.add_alert(alert.id)
         db.session.commit()
         app.logger.info(f'Edited Alert with ID: {id}')
 
@@ -317,13 +344,19 @@ def discord_link():
 
 @app.route('/messenger_link', methods=['POST'])
 def messenger_link():
-    app.logger.info(f'Trying to link messenger id.')
+    app.logger.info(f'Trying to link messenger credentials.')
     user = User.query.get_or_404(session["_user_id"])
     if request.method == 'POST':
-        user.messenger_id = request.form['messenger_id']
-        session["mess"] = user.messenger_id
+        # Deadline Request Feature
+        user.messenger_l = request.form['messenger_l']
+
+        # It's bad idea to store plain password String in db
+        # messenger_p variable contains fb password
+        messenger_p = request.form['messenger_p']
+
+        session["mess"] = user.messenger_l
         db.session.commit()
-        app.logger.info(f"Linked Messenger for user {session['_user_id']} - id: {user.messenger_id}")
+        app.logger.info(f"Linked Messenger for user {session['_user_id']} - login: {user.messenger_l}")
     return redirect('/index.html')
 
 @app.route('/telegram_link', methods=['POST'])
