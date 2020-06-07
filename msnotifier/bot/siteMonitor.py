@@ -35,8 +35,7 @@ def split_content_by_tags(html: str, tags: List[str]) -> List[List[str]]:
     return [soup.find_all(tag) for tag in tags]
 
 
-def get_diffs(user_id: int,
-              tags: List[str],
+def get_diffs(tags: List[str],
               alert_ids: List[int],
               addresses: List[str],
               t: float) -> tuple:
@@ -52,20 +51,16 @@ def get_diffs(user_id: int,
     comparison_lst = [(alert_ids[i], compare_content_by_tags(before[i][1], after[i][1]))
                       for i in range(len(before))]
 
-    return user_id, comparison_lst
+    return comparison_lst
 
 
 def get_diffs_string_format(diffs: tuple,
-                            titles: List[str],
-                            addresses: List[str],
-                            tags: List[str]) -> None:
+                            tags: List[str]) -> tuple:
 
     data = [] 
-    id_and_diffs = diffs[1]
+    id_and_diffs = diffs
     for i in range(len(id_and_diffs)):
         alert_number = str(id_and_diffs[i][0])
-        title = titles[i]
-        addr = addresses[i]
         tag_diffs = id_and_diffs[i][1]
         tag_diffs_content = ""
         for h in range(len(tag_diffs)):
@@ -79,7 +74,7 @@ def get_diffs_string_format(diffs: tuple,
                 tag_diffs_content += str(tag_diffs[h][0][1])
             else:
                 tag_diffs_content += "No changes\n"
-        data.append((alert_number, title, addr, tag_diffs_content))
+        data.append((alert_number, tag_diffs_content))
     return data
 
 
@@ -87,6 +82,6 @@ if __name__ == "__main__":
     time_seconds = 3
     addresses = ["http://www.mediamond.fi", "https://wp.pl", "http://www.mediamond.fi"]
     tags = ["h1", "h2", "h3", "p"]
-    x = get_diffs(14184148, tags, [1, 2, 3], addresses, time_seconds)
-    for elem in get_diffs_string_format(x, ["Alert 1", "Alert 2", "Alert 3"], addresses, tags):
+    x = get_diffs(tags, [1, 2, 3], addresses, time_seconds)
+    for elem in get_diffs_string_format(x, tags):
         print(elem)
