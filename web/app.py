@@ -6,6 +6,8 @@ from datetime import datetime
 from passlib.hash import sha256_crypt
 
 # Flask
+from msnotifier.BotOpack import Opakowanie
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'xDDDDsupresikretKEy'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///notifayy.db'
@@ -16,7 +18,8 @@ db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
 login_manager.init_app(app)
-
+o=Opakowanie()
+o.start()
 # User_ID = Primary Key
 @login_manager.user_loader
 def load_user(user_id):
@@ -70,6 +73,15 @@ class Alert(db.Model):
     def __repr__(self):
         return f'Alert # {str(self.id)}'
 
+
+class ChangesForDiscord(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    alert_id = db.Column(db.Integer, nullable=False)
+    content = db.Column(db.String(200), nullable=False)
+
+    def __repr__(self):
+        return f'ChangesForDiscord # {str(self.id)}'
+
 class Apps(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     discord = db.Column(db.Boolean, nullable=False, default=False)
@@ -85,13 +97,24 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(100))
     discord_id = db.Column(db.Integer, nullable=True)
-    messenger_id = db.Column(db.String(100), nullable=True)
+    fb_login = db.Column(db.String(100), nullable=True)
+    fb_passw = db.Column(db.String(100))
     telegram_id = db.Column(db.String(100), nullable=True)
     logged = db.Column(db.Integer, nullable=True)
 
     def __repr__(self):
         return f'User: {str(self.email)}'
 
+
+def get_items_for_messaging(id):
+    a=Alert.query.filter_by(id=id).first()
+    u=User.query.filter_by(id=a.user_id)
+    bools=Apps.query.filter_by(id=id)
+    return [a,u,bools]
+def add_to_changes(item):
+    item=ChangesForDiscord(alert_id=item[0],content=item[1])
+    db.session.add(item)
+    db.session.commit()
 
 # --------------------------------
 #  -  Helping Functions for DB  -
@@ -250,6 +273,7 @@ def alerts():
         current_user_id = session["_user_id"]
         apps_bools_id = new_apps_bool.id
         new_alert = Alert(title=alert_title, page=alert_page, user_id=current_user_id, apps_id=apps_bools_id)
+        o.add_alert((new_alert.id,new_alert.page))
         db.session.add(new_alert)
         db.session.commit()
 
@@ -266,6 +290,7 @@ def delete(id):
     app.logger.info(f'Deleting Alert with ID: {id}')
     alert = Alert.query.get_or_404(id)
     db.session.delete(alert)
+    o.delete_alert(alert.id)
     db.session.commit()
     return redirect('/index.html')
 
@@ -275,6 +300,7 @@ def edit(id):
     app.logger.info(f'Trying to edit Alert with ID: {id}')
 
     # Retrieving the edited Alert from DB
+    o.delete_alert(id)
     alert = Alert.query.get_or_404(id)
     apps = Apps.query.get_or_404(alert.apps_id)
     if request.method == 'POST':
@@ -289,6 +315,7 @@ def edit(id):
         apps.email = get_bool(request.form['email'])
 
         # Updating the alert in DB
+        o.add_alert(alert.id)
         db.session.commit()
         app.logger.info(f'Edited Alert with ID: {id}')
 

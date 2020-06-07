@@ -3,6 +3,12 @@ import time
 from bs4 import BeautifulSoup
 from typing import List
 
+class Alert:
+    def __init__(self,adr,user_id):
+        self.adr=adr
+        self.user_id=user_id
+        self.errors=[]
+
 
 def compare_content_by_tags(previous: List[List[str]],
                             current: List[List[str]]) -> List[List[tuple]]:
@@ -35,10 +41,10 @@ def split_content_by_tags(html: str, tags: List[str]) -> List[List[str]]:
     return [soup.find_all(tag) for tag in tags]
 
 
-def get_diffs(tags: List[str], addresses: List[str], t: float) -> list:
-    before = [split_content_by_tags(get_content(url), tags) for url in addresses]
+def get_diffs(tags: List[str], addresses: List[Alert], t: float) -> list:
+    before = [split_content_by_tags(get_content(url.adr), tags) for url in addresses]
     time.sleep(t)
-    after = [split_content_by_tags(get_content(url), tags) for url in addresses]
+    after = [split_content_by_tags(get_content(url.adr), tags) for url in addresses]
     comparison_lst = []
     for i in range(len(before)):
         comparison_lst.append(compare_content_by_tags(before[i], after[i]))
@@ -58,8 +64,8 @@ It means that mediamond.fi webpage didn't have any h1, h2 differences,
 while wp.pl had differences in h1, in that case there was one item with h1 tag, and afterwards None of them. 
 """
 if __name__ == "__main__":
-    time_seconds = 15
-    addresses = ["http://www.mediamond.fi", "https://wp.pl"]
+    time_seconds = 10
+    addresses = [Alert("https://www.onet.pl",1)]
     for elem in get_diffs(["h1", "h2"], addresses, time_seconds):
         for tag_diff in elem:
             print(tag_diff)
