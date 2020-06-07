@@ -64,6 +64,12 @@
                 <button type="button" class="btn btn-outline-dark fas fa-cog" data-toggle="collapse" aria-pressed="false" data-target="#collapseTelegram"></button>
             </div>
 
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-outline-dark" name='email' id='email_new' data-toggle="button" aria-pressed="false" autocomplete="off">
+                    Email
+                </button>
+            </div>
+
             <input class="btn btn-outline-primary" onclick="send_form_new_alert()" href='#' style="float: right;" value='Add New Alert'>
 
             <script>
@@ -73,7 +79,14 @@
                     var g_discord = cap($("#discord_new").attr('aria-pressed'));
                     var g_messenger = cap($("#messenger_new").attr('aria-pressed'));
                     var g_telegram = cap($("#telegram_new").attr('aria-pressed'));
-                    send_form('/alerts', {title: g_title, page: g_page, discord: g_discord, messenger: g_messenger, telegram: g_telegram})
+                    var g_email = cap($("#email_new").attr('aria-pressed'));
+                    send_form('/alerts', {
+                        title: g_title,
+                        page: g_page,
+                        discord: g_discord,
+                        messenger: g_messenger,
+                        telegram: g_telegram,
+                        email: g_email})
                 }
                 
                 // First Letter to uppercase
@@ -101,8 +114,8 @@
                     <div class="input-group-prepend">
                       <span class="input-group-text" id="basic-addon1">Your Facebook Page:</span>
                     </div>
-                    <input type="text" class="form-control" placeholder="facebook.com/notiff.ayy" aria-label="Username" style="margin-right: 10px;">
-                    <button type="button" id="connect_button_m" class="btn btn-outline-success">Connect</button>
+                    <input type="text" class="form-control" id="messenger_id_input" value="{{messsaved}}" placeholder="facebook.com/notiff.ayy" aria-label="Username" style="margin-right: 10px;">
+                    <button type="button" onclick="link_messenger()" href='#' id="connect_button_m" class="btn btn-outline-success">Connect</button>
                 </div>
             </div>
         </div>
@@ -111,10 +124,10 @@
             <div class="container-fluid">
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
-                      <span class="input-group-text" id="basic-addon1">Your Discord Name:</span>
+                      <span class="input-group-text" id="basic-addon1">Your Discord ID:</span>
                     </div>
-                    <input type="text" class="form-control" placeholder="Notifayy#2934" aria-label="Username" style="margin-right: 10px;">
-                    <button type="button" id="connect_button_d" class="btn btn-outline-success">Connect</button>
+                    <input type="text" class="form-control" id="discord_id_input" value="{{discsaved}}" placeholder="Notifayy#2934" aria-label="Username" style="margin-right: 10px;">
+                    <button type="button" onclick="link_discord()" href='#' id="connect_button_d" class="btn btn-outline-success">Connect</button>
                 </div>
             </div>
         </div>
@@ -125,11 +138,28 @@
                     <div class="input-group-prepend">
                       <span class="input-group-text" id="basic-addon1">Your Telegram Name:</span>
                     </div>
-                    <input type="text" class="form-control" placeholder="Notifayy#1337" aria-label="Username" style="margin-right: 10px;">
-                    <button type="button" id="connect_button_t" class="btn btn-outline-success">Connect</button>
+                    <input type="text" class="form-control" id="telegram_id_input" value="{{telesaved}}" placeholder="Notifayy#1337" aria-label="Username" style="margin-right: 10px;">
+                    <button type="button" onclick="link_telegram()"  href='#' id="connect_button_t" class="btn btn-outline-success">Connect</button>
                 </div>
             </div>
         </div>
+
+        <script>
+            function link_messenger(){
+                var messenger_id_input = $("#messenger_id_input").val()
+                send_form('/messenger_link', {messenger_id: messenger_id_input})
+            }
+            
+           function link_discord(){
+                var discord_id_input = $("#discord_id_input").val()
+                send_form('/discord_link', {discord_id: discord_id_input})
+            }
+
+            function link_telegram(){
+                var telegram_id_input = $("#telegram_id_input").val()
+                send_form('/telegram_link', {telegram_id: telegram_id_input})
+            }
+        </script>
 
         <!-- All Alerts -->
         <hr>
@@ -159,6 +189,11 @@
                     <a class="btn btn-outline-dark fas fa-comment" id="mes-{{alert.id}}" data-toggle="button" aria-pressed="false" style="float: right; margin-right: 5px;"></a>
                 {% endif %}
 
+                {% if alert.email %}
+                    <a class="btn btn-outline-dark fas fa-envelope active" id="eml-{{alert.id}}" data-toggle="button" aria-pressed="true" style="float: right; margin-right: 5px;"></a>
+                {% else %}
+                    <a class="btn btn-outline-dark fas fa-envelope" id="eml-{{alert.id}}" data-toggle="button" aria-pressed="false" style="float: right; margin-right: 5px;"></a>
+                {% endif %}
 
                 </h3>
             </div>
@@ -179,7 +214,14 @@
                 var g_discord = cap($("#dis-"+alert_id).attr('aria-pressed'));
                 var g_messenger = cap($("#mes-"+alert_id).attr('aria-pressed'));
                 var g_telegram = cap($("#tel-"+alert_id).attr('aria-pressed'));
-                send_form('/alerts/edit/'+alert_id, {title: g_title, page: g_page, discord: g_discord, messenger: g_messenger, telegram: g_telegram})
+                var g_email = cap($("#eml-"+alert_id).attr('aria-pressed'));
+                send_form('/alerts/edit/'+alert_id, {
+                    title: g_title,
+                    page: g_page,
+                    discord: g_discord,
+                    messenger: g_messenger,
+                    telegram: g_telegram,
+                    email: g_email})
             }
         </script>
 
