@@ -10,7 +10,7 @@ class Sending(threading.Thread):
     def run(self):
         for item in  self.changes:
             # z itema wyciągamy alert_id i content
-            content=item.content
+            content=item.item[1]
             alert_id=item[0]
             dboutput=web.app.get_items_for_messaging(alert_id)
             alertwebpage=dboutput[0].page
@@ -34,7 +34,7 @@ class Sending(threading.Thread):
 
 
 
-class Opakowanie(threading.Thread):
+class Detecting(threading.Thread):
 
     def __init__(self):
         threading.Thread.__init__(self)
@@ -50,7 +50,11 @@ class Opakowanie(threading.Thread):
         self.alerts.append((alert_id,adr))
     def run(self):
         while(True):
-            changes=siteMonitor.getdiffs(["h1", "h2"],self.alerts,50)
+
+            tags = ["h1", "h2", "h3", "p"]
+            changes=siteMonitor.get_diffs_string_format(siteMonitor.get_diffs(tags,[alert[0] for alert in self.alerts],[alert[1] for alert in self.alerts],50),tags)
+
+
             if changes!=0:
                 Sending(changes).start()
 
