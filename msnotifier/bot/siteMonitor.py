@@ -55,9 +55,9 @@ def get_diffs(user_id: int,
     return user_id, comparison_lst
 
 
-def get_diffs_string_format(diffs: tuple, 
-                            titles: List[str], 
-                            addresses: List[str], 
+def get_diffs_string_format(diffs: tuple,
+                            titles: List[str],
+                            addresses: List[str],
                             tags: List[str]) -> None:
     message = ""
     id_and_diffs = diffs[1]
@@ -72,7 +72,7 @@ def get_diffs_string_format(diffs: tuple,
         message += "\n\n"
         tag_diffs = id_and_diffs[i][1]
         for h in range(len(tag_diffs)):
-            message += ("TAG")
+            message += ("\nTAG ")
             message += tags[h]
             message += "\n"
             if tag_diffs[h]:
@@ -85,19 +85,6 @@ def get_diffs_string_format(diffs: tuple,
     return message
 
 
-
-"""
-For each website there are tag_diffs, which are tuples of content with the tag before and after
-Example print for data below:
-[]
-[]
-[(<h1 class="ywentc-1 gSKBNp"><a class="sc-1opjz2c-0 hJbLrA" href="https://wiadomosci.wp.pl/">
-Tym żyje Polska <span class="ywentc-5 ciJuja">
-</span></a></h1>, None)]
-[]
-It means that mediamond.fi webpage didn't have any h1, h2 differences,
-while wp.pl had differences in h1, in that case there was one item with h1 tag, and afterwards None of them. 
-"""
 if __name__ == "__main__":
     time_seconds = 3
     addresses = ["http://www.mediamond.fi", "https://wp.pl", "http://www.mediamond.fi"]
