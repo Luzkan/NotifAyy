@@ -3,6 +3,12 @@ import time
 from bs4 import BeautifulSoup
 from typing import List
 
+class Alert:
+    def __init__(self,adr,user_id):
+        self.adr=adr
+        self.user_id=user_id
+        self.errors=[]
+
 
 def compare_content_by_tags(previous: List[List[str]],
                             current: List[List[str]]) -> List[List[tuple]]:
@@ -33,6 +39,7 @@ def modified_zip(first: list, second: list):
 def split_content_by_tags(html: str, tags: List[str]) -> List[List[str]]:
     soup = BeautifulSoup(html, "html.parser")
     return [soup.find_all(tag) for tag in tags]
+
 
 
 def get_diffs(user_id: int,
@@ -90,3 +97,4 @@ if __name__ == "__main__":
     x = get_diffs(14184148, tags, [1, 2, 3], addresses, time_seconds)
     for elem in get_diffs_string_format(x, ["Alert 1", "Alert 2", "Alert 3"], addresses, tags):
         print(elem)
+

@@ -1,5 +1,7 @@
 import smtplib
 from abc import ABC, abstractmethod
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 import fbchat
 # import telegram as telegram
@@ -24,7 +26,7 @@ class Notifier(ABC):
         pass
 
     @abstractmethod
-    def message_myself(self, content) -> int:
+    def message_myself(self, content,web) -> int:
         pass
 
 
@@ -38,7 +40,8 @@ class fb_chat(Notifier):
             return 0
         return 1
 
-    def message_myself(self, content):
+    def message_myself(self, content,web):
+        content= "CHANGE DETECTED ON"+Website+"\n "+content
         sent = self.client.sendMessage(content, thread_id=self.client.uid, thread_type=ThreadType.USER)
         if sent:
             return 1
@@ -52,7 +55,7 @@ class telegram_chat(Notifier):
     def log_into(self, login, password):
         pass
 
-    def message_myself(self, content):
+    def message_myself(self, content,web):
         pass
 
 
@@ -60,7 +63,7 @@ class discord_chat(Notifier):
     def log_into(self, login, password):
         pass
 
-    def message_myself(self, content):
+    def message_myself(self, content,web):
         pass
 
 
@@ -73,9 +76,15 @@ class mail_chat(Notifier):
         self.smtpserver.ehlo()
         self.smtpserver.starttls()
         self.smtpserver.ehlo()
-        self.smtpserver.login(login, password)
+        self.smtpserver.login("notifaay@gmail.com", "TestTest123")
         self.mail = login
 
-    def message_myself(self, content):
-        self.smtpserver.sendmail(self.mail, self.mail, content)
+    def message_myself(self, content,web):
+        msg = MIMEMultipart()
+        msg['From']="notifaay@gmail.com"
+        msg['TO']=self.mail
+
+        msg['Subject'] = "CHANGE DETECTED ON "+web
+        msg.attach(MIMEText(content, 'plain'))
+        self.smtpserver.send_message(msg)
         self.smtpserver.close()
