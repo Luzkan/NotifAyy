@@ -1,4 +1,4 @@
-from msnotifier.example import add
+from web.msnotifier.example import add
 
 
 def test_add_correct():

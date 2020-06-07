@@ -1,12 +1,75 @@
-import logging
 from flask import Flask, render_template, request, redirect, flash, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, LoginManager, login_user, logout_user
 from datetime import datetime
 from passlib.hash import sha256_crypt
 
+import web.msnotifier as ms
+import threading
 # Flask
-import msnotifier.Threads
+
+class Sending(threading.Thread):
+    def __init__(self,changes):
+        threading.Thread.__init__(self)
+        self.changes =changes
+    def run(self):
+        for item in  self.changes:
+            # z itema wyciągamy alert_id i content
+            content=item[1]
+            alert_id=item[0]
+            al=Alert.query.filter_by(id=alert_id)
+            user=User.query.filter_by(id=al.user_id)
+            apps=Apps.query.filter_by(id=al.apps_id)
+            alertwebpage=al.page
+            mail=apps.email
+            msng=apps.messenger
+            discord=apps.discord
+            if mail==True:
+                email=user.email
+                notifier= messenger.mail_chat()
+                notifier.log_into(email,"")
+                notifier.message_myself(content,alertwebpage)
+            if msng==True:
+                fblogin=user.fb_login
+                fbpass=user.fb_passw
+                notifier= messenger.mail_chat()
+                notifier.log_into(fblogin,fbpass)
+                notifier.message_myself(content,alertwebpage)
+            if discord==True:
+                add_to_changes(item)
+
+
+
+
+class Detecting(threading.Thread):
+
+    def __init__(self):
+        threading.Thread.__init__(self)
+        self.alerts=[]
+    def delete_alert(self,alert_id):
+        for alert in self.alerts:
+            if alert[0]==alert_id:
+                self.alerts.remove(alert)
+                return 1
+        return -1
+
+    def add_alert(self,alert_id,adr):
+        self.alerts.append((alert_id,adr))
+    def run(self):
+        self.alerts=get_alerts()
+        while(True):
+
+            tags = ["h1", "h2", "h3", "p"]
+            changes= siteMonitor.get_diffs_string_format(
+                siteMonitor.get_diffs(tags,
+                                      [alert[0] for alert in self.alerts],
+                                      [alert[1] for alert in self.alerts], 50), tags)
+
+
+
+
+            if len(changes)!=0:
+                Sending(changes).start()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'xDDDDsupresikretKEy'
@@ -18,7 +81,7 @@ db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
 login_manager.init_app(app)
-o=Opakowanie()
+o=Detecting()
 o.start()
 # User_ID = Primary Key
 @login_manager.user_loader
@@ -107,11 +170,6 @@ class User(UserMixin, db.Model):
         return f'User: {str(self.email)}'
 
 
-def get_items_for_messaging(id):
-    a=Alert.query.filter_by(id=id).first()
-    u=User.query.filter_by(id=a.user_id)
-    bools=Apps.query.filter_by(id=id)
-    return [a,u,bools]
 def add_to_changes(item):
     item=ChangesForDiscord(alert_id=item[0],content=item[1])
     db.session.add(item)
@@ -273,8 +331,9 @@ def alerts():
         current_user_id = session["_user_id"]
         apps_bools_id = new_apps_bool.id
         new_alert = Alert(title=alert_title, page=alert_page, user_id=current_user_id, apps_id=apps_bools_id)
-        o.add_alert((new_alert.id,new_alert.page))
         db.session.add(new_alert)
+        db.session.flush()
+        o.add_alert((new_alert.id,new_alert.page))
         db.session.commit()
 
         return redirect('/index.html')
@@ -315,7 +374,7 @@ def edit(id):
         apps.email = get_bool(request.form['email'])
 
         # Updating the alert in DB
-        o.add_alert(alert.id)
+        o.add_alert(alert.id,alert.page)
         db.session.commit()
         app.logger.info(f'Edited Alert with ID: {id}')
 
