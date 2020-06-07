@@ -6,7 +6,7 @@ from datetime import datetime
 from passlib.hash import sha256_crypt
 
 # Flask
-from msnotifier.BotOpack import Opakowanie
+import msnotifier.Threads
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'xDDDDsupresikretKEy'
