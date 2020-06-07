@@ -5,8 +5,66 @@ from flask_login import UserMixin, LoginManager, login_user, logout_user
 from datetime import datetime
 from passlib.hash import sha256_crypt
 
-# Flask
-import msnotifier.Threads
+import msnotifier.bot.siteMonitor as siteMonitor
+import threading
+import msnotifier.messenger as messenger
+
+class Sending(threading.Thread):
+    def __init__(self,changes):
+        threading.Thread.__init__(self)
+        self.changes =changes
+    def run(self):
+        for item in  self.changes:
+            # z itema wyciągamy alert_id i content
+            content=item[1]
+            alert_id=item[0]
+            dboutput=get_items_for_messaging(alert_id)
+            alertwebpage=dboutput[0].page
+            mail=dboutput[2].email
+            msng=dboutput[2].messenger
+            discord=dboutput[2].discord
+            if mail==True:
+                email=dboutput[1].email
+                notifier=messenger.mail_chat()
+                notifier.log_into(email,"")
+                notifier.message_myself(content,alertwebpage)
+            if msng==True:
+                fblogin=dboutput[1].fb_login
+                fbpass=dboutput[1].fb_passw
+                notifier=messenger.mail_chat()
+                notifier.log_into(fblogin,fbpass)
+                notifier.message_myself(content,alertwebpage)
+            if discord==True:
+                add_to_changes(item)
+
+
+
+
+class Detecting(threading.Thread):
+
+    def __init__(self):
+        threading.Thread.__init__(self)
+        self.alerts=[]
+    def delete_alert(self,alert_id):
+        for alert in self.alerts:
+            if alert[0]==alert_id:
+                self.alerts.remove(alert)
+                return 1
+        return -1
+
+    def add_alert(self,alert_id,adr):
+        self.alerts.append((alert_id,adr))
+    def run(self):
+        while(True):
+
+            tags = ["h1", "h2", "h3", "p"]
+            changes=siteMonitor.get_diffs_string_format(siteMonitor.get_diffs(tags,[alert[0] for alert in self.alerts],[alert[1] for alert in self.alerts],50),tags)
+
+
+            if changes!=0:
+                Sending(changes).start()
+
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'xDDDDsupresikretKEy'
@@ -18,7 +76,7 @@ db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
 login_manager.init_app(app)
-o=Opakowanie()
+o=Detecting()
 o.start()
 # User_ID = Primary Key
 @login_manager.user_loader
@@ -282,7 +340,7 @@ def alerts():
         current_user_id = session["_user_id"]
         apps_bools_id = new_apps_bool.id
         new_alert = Alert(title=alert_title, page=alert_page, user_id=current_user_id, apps_id=apps_bools_id)
-        o.add_alert((new_alert.id,new_alert.page))
+        o.add_alert(new_alert.id,new_alert.page)
         db.session.add(new_alert)
         db.session.commit()
 
@@ -324,7 +382,7 @@ def edit(id):
         apps.email = get_bool(request.form['email'])
 
         # Updating the alert in DB
-        o.add_alert(alert.id)
+        o.add_alert(alert.id, alert.page)
         db.session.commit()
         app.logger.info(f'Edited Alert with ID: {id}')
 
@@ -399,9 +457,21 @@ def logout():
     return redirect('/')
 
 @app.route('/changes', methods=['GET'])
-def chages():
-    print(request.args.get('discordId'))
-    return jsonify({"change": "change 1"})
+def changes():
+    change = ChangesForDiscord.query.first()
+    if change is None:
+        return jsonify({"change": '', "discid": -1})
+
+    db.session.delete(change)
+    db.session.commit()
+    alrt = Alert.query.filter_by(id = change.alert_id).first()
+    usr = User.query.filter_by(id = alrt.user_id).first()
+    if usr is None:
+        return jsonify({"change": '', "discid": -1})
+
+    result = jsonify({"change": change.content, "discid": usr.discord_id})
+    return result
+
 
 
 if __name__ == "__main__":
