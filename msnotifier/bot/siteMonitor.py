@@ -59,30 +59,28 @@ def get_diffs_string_format(diffs: tuple,
                             titles: List[str],
                             addresses: List[str],
                             tags: List[str]) -> None:
-    message = ""
+
+    data = [] 
     id_and_diffs = diffs[1]
     for i in range(len(id_and_diffs)):
-        message += "\n"
-        message += ("Changes for alert number ")
-        message += str(id_and_diffs[i][0])
-        message += " with title: "
-        message += titles[i]
-        message += " and address: "
-        message += addresses[i]
-        message += "\n\n"
+        alert_number = str(id_and_diffs[i][0])
+        title = titles[i]
+        addr = addresses[i]
         tag_diffs = id_and_diffs[i][1]
+        tag_diffs_content = ""
         for h in range(len(tag_diffs)):
-            message += ("\nTAG ")
-            message += tags[h]
-            message += "\n"
+            tag_diffs_content += ("\nTAG ")
+            tag_diffs_content += tags[h]
+            tag_diffs_content += "\n"
             if tag_diffs[h]:
-                message += "\nBEFORE:\n"
-                message += str(tag_diffs[h][0][0])
-                message += "\nAFTER:\n"
-                message += str(tag_diffs[h][0][1])
+                tag_diffs_content += "\nBEFORE:\n"
+                tag_diffs_content += str(tag_diffs[h][0][0])
+                tag_diffs_content += "\nAFTER:\n"
+                tag_diffs_content += str(tag_diffs[h][0][1])
             else:
-                message += "No changes\n"
-    return message
+                tag_diffs_content += "No changes\n"
+        data.append((alert_number, title, addr, tag_diffs_content))
+    return data
 
 
 if __name__ == "__main__":
@@ -90,4 +88,5 @@ if __name__ == "__main__":
     addresses = ["http://www.mediamond.fi", "https://wp.pl", "http://www.mediamond.fi"]
     tags = ["h1", "h2", "h3", "p"]
     x = get_diffs(14184148, tags, [1, 2, 3], addresses, time_seconds)
-    print(get_diffs_string_format(x, ["Alert 1", "Alert 2", "Alert 3"], addresses, tags))
+    for elem in get_diffs_string_format(x, ["Alert 1", "Alert 2", "Alert 3"], addresses, tags):
+        print(elem)
