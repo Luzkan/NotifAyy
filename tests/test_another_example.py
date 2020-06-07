@@ -1,4 +1,4 @@
-from msnotifier.another_example import subtract
+from web.msnotifier.another_example import subtract
 
 
 def test_subtract_correct():
