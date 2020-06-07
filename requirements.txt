@@ -3,3 +3,4 @@ flake8-commas==2.0.0
 pytest==5.4.1
 beautifulsoup4==4.9.0
 fbchat==1.9.6
+discord==1.0.1
