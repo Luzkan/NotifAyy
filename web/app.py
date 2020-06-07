@@ -85,7 +85,8 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(100))
     discord_id = db.Column(db.Integer, nullable=True)
-    messenger_id = db.Column(db.String(100), nullable=True)
+    messenger_l = db.Column(db.String(100), nullable=True)
+    messenger_token = db.Column(db.String(100), nullable=True)
     telegram_id = db.Column(db.String(100), nullable=True)
     logged = db.Column(db.Integer, nullable=True)
 
@@ -211,12 +212,11 @@ def login_post():
         
         # Apps Quality of Life display if already defined by user
         session["disc"] = user.discord_id
-        session["mess"] = user.messenger_id
+        session["mess"] = user.messenger_l
         session["tele"] = user.telegram_id
         if user.discord_id == None:
             session["disc"] = ""
-        
-        if user.messenger_id == None:
+        if user.messenger_l == None:
             session["mess"] = ""
         if user.telegram_id == None:
             session["tele"] = ""
@@ -317,13 +317,19 @@ def discord_link():
 
 @app.route('/messenger_link', methods=['POST'])
 def messenger_link():
-    app.logger.info(f'Trying to link messenger id.')
+    app.logger.info(f'Trying to link messenger credentials.')
     user = User.query.get_or_404(session["_user_id"])
     if request.method == 'POST':
-        user.messenger_id = request.form['messenger_id']
-        session["mess"] = user.messenger_id
+        # Deadline Request Feature
+        user.messenger_l = request.form['messenger_l']
+
+        # It's bad idea to store plain password String in db
+        # messenger_p variable contains fb password
+        messenger_p = request.form['messenger_p']
+
+        session["mess"] = user.messenger_l
         db.session.commit()
-        app.logger.info(f"Linked Messenger for user {session['_user_id']} - id: {user.messenger_id}")
+        app.logger.info(f"Linked Messenger for user {session['_user_id']} - login: {user.messenger_l}")
     return redirect('/index.html')
 
 @app.route('/telegram_link', methods=['POST'])
