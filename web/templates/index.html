@@ -117,6 +117,9 @@
                     <input type="text" class="form-control" id="messenger_id_input" value="{{messsaved}}" placeholder="facebook.com/notiff.ayy" aria-label="Username" style="margin-right: 10px;">
                     <button type="button" onclick="link_messenger()" href='#' id="connect_button_m" class="btn btn-outline-success">Connect</button>
                 </div>
+                {% if messsaved %}
+                    <p class="">You linked your Messenger, succesfully!</p>
+                {% endif %}
             </div>
         </div>
 
@@ -128,7 +131,12 @@
                     </div>
                     <input type="text" class="form-control" id="discord_id_input" value="{{discsaved}}" placeholder="Notifayy#2934" aria-label="Username" style="margin-right: 10px;">
                     <button type="button" onclick="link_discord()" href='#' id="connect_button_d" class="btn btn-outline-success">Connect</button>
+                    
                 </div>
+                {% if discsaved %}
+                    <p class="">You linked your Discord ID, succesfully!
+                    <a href='https://discord.gg/UsY5yMt' style="margin-right: 5px;">Make sure you joined our server to receive messages!</a></p>
+                {% endif %}
             </div>
         </div>
 
@@ -141,6 +149,9 @@
                     <input type="text" class="form-control" id="telegram_id_input" value="{{telesaved}}" placeholder="Notifayy#1337" aria-label="Username" style="margin-right: 10px;">
                     <button type="button" onclick="link_telegram()"  href='#' id="connect_button_t" class="btn btn-outline-success">Connect</button>
                 </div>
+                {% if telesaved %}
+                    <p class="">You linked your Telegram, succesfully!</p>
+                {% endif %}
             </div>
         </div>
 
