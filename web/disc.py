@@ -2,6 +2,7 @@ import discord
 import time
 import requests
 import json
+import re
 
 client = discord.Client()
 
@@ -48,11 +49,11 @@ async def changes():
                         continue
 
                     if response['discid'] == member.id and response['change'] is not None:
-                        print(response)
-                        await member.create_dm()
-                        await member.dm_channel.send(
-                            'Recent changes: ' + response['change']
-                        )
+                        if len(response['change']) < 1900:
+                            await member.create_dm()
+                            await member.dm_channel.send(
+                                '\n**' + response['title'] + '**\n' + response['page'] + '\n' + formatChanges(response['change'])
+                            )
             # '''
             # for member in members:
             #     if member == client.user:
@@ -72,10 +73,26 @@ async def changes():
         except requests.exceptions.RequestException as err:
             print(err)
 
-        except TypeError as err:
-            print(err)
+        except KeyboardInterrupt:
+            print('Interrupted')
+            break
 
         time.sleep(10)
+
+
+def formatChanges(data):
+    added, removed = [], []
+    splitted = re.split('(BEFORE:|AFTER:|TAG h1|TAG h2|TAG h3|TAG p)', data)
+    for i, d in enumerate(splitted):
+        if d == 'BEFORE:':
+            if splitted[i+1] != '\nNone\n' and splitted[i+1] != '\nNone':
+                removed.append('<:red_circle:719653263049490514>  ' + splitted[i+1])
+        elif d == 'AFTER:':
+            if splitted[i+1] != '\nNone\n' and splitted[i+1] != '\nNone':
+                added.append('<:green_circle:719650914960539689>  ' + splitted[i+1])
+
+    return '\n'.join(removed + added) 
+
 
 
 client.run(botToken)
