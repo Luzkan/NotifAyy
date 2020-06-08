@@ -9,60 +9,7 @@ import msnotifier.bot.siteMonitor as siteMonitor
 import threading
 import msnotifier.messenger as messenger
 
-class Sending(threading.Thread):
-    def __init__(self,changes):
-        threading.Thread.__init__(self)
-        self.changes =changes
-    def run(self):
-        for item in  self.changes:
-            # z itema wyciągamy alert_id i content
-            content=item[1]
-            alert_id=item[0]
-            dboutput=get_items_for_messaging(alert_id)
-            alertwebpage=dboutput[0].page
-            mail=dboutput[2].email
-            msng=dboutput[2].messenger
-            discord=dboutput[2].discord
-            if mail==True:
-                email=dboutput[1].email
-                notifier=messenger.mail_chat()
-                notifier.log_into(email,"")
-                notifier.message_myself(content,alertwebpage)
-            if msng==True:
-                fblogin=dboutput[1].fb_login
-                fbpass=dboutput[1].fb_passw
-                notifier=messenger.mail_chat()
-                notifier.log_into(fblogin,fbpass)
-                notifier.message_myself(content,alertwebpage)
-            if discord==True:
-                add_to_changes(item)
 
-
-
-
-class Detecting(threading.Thread):
-
-    def __init__(self):
-        threading.Thread.__init__(self)
-        self.alerts=[]
-    def delete_alert(self,alert_id):
-        for alert in self.alerts:
-            if alert[0]==alert_id:
-                self.alerts.remove(alert)
-                return 1
-        return -1
-
-    def add_alert(self,alert_id,adr):
-        self.alerts.append((alert_id,adr))
-    def run(self):
-        while(True):
-
-            tags = ["h1", "h2", "h3", "p"]
-            changes=siteMonitor.get_diffs_string_format(siteMonitor.get_diffs(tags,[alert[0] for alert in self.alerts],[alert[1] for alert in self.alerts],50),tags)
-
-
-            if changes!=0:
-                Sending(changes).start()
 
 
 
@@ -76,8 +23,7 @@ db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
 login_manager.init_app(app)
-o=Detecting()
-o.start()
+
 # User_ID = Primary Key
 @login_manager.user_loader
 def load_user(user_id):
@@ -177,6 +123,75 @@ def add_to_changes(item):
 
 # --------------------------------
 #  -  Helping Functions for DB  -
+
+def get_everything(alert_id):
+    al=Alert.query.filter_by(id=alert_id).first()
+    user=User.query.filter_by(id=al.user_id).first()
+    apps=Apps.query.filter_by(id=al.apps_id).first()
+    return al, user, apps
+
+def allAlerts():
+    return Alert.query.all()
+
+class Sending(threading.Thread):
+    def __init__(self,changes):
+        threading.Thread.__init__(self)
+        self.changes =changes
+    def run(self):
+        for item in  self.changes:
+            # z itema wyciągamy alert_id i content
+            content=item[1]
+            alert_id=item[0]
+            al, user, apps = get_everything(alert_id)
+            alertwebpage=al.page
+            mail=apps.email
+            msng=apps.messenger
+            discord=apps.discord
+            if mail==True:
+                email=user.email
+                notifier= messenger.mail_chat()
+                notifier.log_into(email,"")
+                notifier.message_myself(content,alertwebpage)
+            if msng==True:
+                fblogin=user.fb_login
+                fbpass=user.fb_passw
+                notifier= messenger.mail_chat()
+                notifier.log_into(fblogin,fbpass)
+                notifier.message_myself(content,alertwebpage)
+            if discord==True:
+                add_to_changes(item)
+
+
+class Detecting(threading.Thread):
+
+    def __init__(self):
+        threading.Thread.__init__(self)
+        self.alerts=[]
+
+    def get_all_alerts(self):
+        return [(i.id, i.page) for i in allAlerts()]
+    def delete_alert(self,alert_id):
+        for alert in self.alerts:
+            if alert[0]==alert_id:
+                self.alerts.remove(alert)
+                return 1
+        return -1
+
+    def add_alert(self,alert_id,adr):
+        self.alerts.append((alert_id,adr))
+    def run(self):
+        self.alerts = self.get_all_alerts()
+        while(True):
+
+            tags = ["h1", "h2", "h3", "p"]
+            changes=siteMonitor.get_diffs_string_format(siteMonitor.get_diffs(tags,[alert[0] for alert in self.alerts],[alert[1] for alert in self.alerts],16),tags)
+
+
+            if len(changes)!=0:
+                Sending(changes).start()
+
+o=Detecting()
+o.start()
 
 def get_alerts():
     # Getting current User ID and retrieving his alerts
@@ -340,8 +355,9 @@ def alerts():
         current_user_id = session["_user_id"]
         apps_bools_id = new_apps_bool.id
         new_alert = Alert(title=alert_title, page=alert_page, user_id=current_user_id, apps_id=apps_bools_id)
-        o.add_alert(new_alert.id,new_alert.page)
         db.session.add(new_alert)
+        db.session.flush()
+        o.add_alert(new_alert.id,new_alert.page)
         db.session.commit()
 
         return redirect('/index.html')

@@ -75,7 +75,7 @@ async def changes():
         except TypeError as err:
             print(err)
 
-        time.sleep(2)
+        time.sleep(10)
 
 
 client.run(botToken)
