@@ -80,20 +80,40 @@ async def changes():
         time.sleep(10)
 
 
+def clean_html_tags(content: str) -> str:
+    tag = False
+    quote = False
+    out = ""
+
+    for c in content:
+        if c == '<' and not quote:
+            tag = True
+        elif c == '>' and not quote:
+            tag = False
+        elif (c == '"' or c == "'") and tag:
+            quote = not quote
+        elif not tag:
+            out = out + c
+    return out
+
+
 def formatChanges(data):
     added, removed = [], []
     splitted = re.split('(BEFORE:|AFTER:|TAG h1|TAG h2|TAG h3|TAG p)', data)
     for i, d in enumerate(splitted):
         if d == 'BEFORE:':
             if splitted[i+1] != '\nNone\n' and splitted[i+1] != '\nNone':
-                removed.append('<:red_circle:719653263049490514>  ' + splitted[i+1])
+                clean_text = clean_html_tags(splitted[i+1])
+                removed.append('<:red_circle:719653263049490514>  '
+                               + clean_text)
         elif d == 'AFTER:':
             if splitted[i+1] != '\nNone\n' and splitted[i+1] != '\nNone':
-                added.append('<:green_circle:719650914960539689>  ' + splitted[i+1])
+                clean_text = clean_html_tags(splitted[i+1])
+                added.append('<:green_circle:719650914960539689>  '
+                             + clean_text)
 
     return '\n'.join(removed + added) 
 
 
 
 client.run(botToken)
-
