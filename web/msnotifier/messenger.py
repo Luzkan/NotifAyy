@@ -14,8 +14,6 @@ def retry_logging(func):
 
     pass
 
-# -- MODULE THAT IMPLEMENTS NOTIFIER Abstract class that handle messaging users
-# -- on Fb and mail channels. Telegram is undone, Discord is handled in the other way
 
 class Notifier(ABC):
     """
