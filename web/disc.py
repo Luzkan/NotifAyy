@@ -86,11 +86,9 @@ def formatChanges(data):
     for i, d in enumerate(splitted):
         if d == 'BEFORE:':
             if splitted[i+1] != '\nNone\n' and splitted[i+1] != '\nNone':
-                # clean_text = clean_html_tags(splitted[i+1])
                 removed.append('<:red_circle:719653263049490514>  ' + splitted[i+1])
         elif d == 'AFTER:':
             if splitted[i+1] != '\nNone\n' and splitted[i+1] != '\nNone':
-                # clean_text = clean_html_tags(splitted[i+1])
                 added.append('<:green_circle:719650914960539689>  ' + splitted[i+1])
 
     return '\n'.join(removed + added) 
