@@ -30,6 +30,23 @@ def modified_zip(first: list, second: list):
     return result
 
 
+def clean_html_tags(content: str) -> str:
+    tag = False
+    quote = False
+    out = ""
+
+    for c in content:
+        if c == '<' and not quote:
+            tag = True
+        elif c == '>' and not quote:
+            tag = False
+        elif (c == '"' or c == "'") and tag:
+            quote = not quote
+        elif not tag:
+            out = out + c
+    return out
+
+
 def split_content_by_tags(html: str, tags: List[str]) -> List[List[str]]:
     soup = BeautifulSoup(html, "html.parser")
     return [soup.find_all(tag) for tag in tags]
@@ -69,19 +86,19 @@ def get_diffs_string_format(diffs: tuple,
             tag_diffs_content += "\n"
             if tag_diffs[h]:
                 tag_diffs_content += "\nBEFORE:\n"
-                tag_diffs_content += str(tag_diffs[h][0][0])
+                tag_diffs_content += clean_html_tags(str(tag_diffs[h][0][0]))
                 tag_diffs_content += "\nAFTER:\n"
-                tag_diffs_content += str(tag_diffs[h][0][1])
+                tag_diffs_content += clean_html_tags(str(tag_diffs[h][0][1]))
             else:
                 tag_diffs_content += "No changes\n"
         data.append((alert_number, tag_diffs_content))
     return data
+
+
 if __name__ == "__main__":
     time_seconds = 3
-    alerts = [(1, "https://www.onet.pl")]
-
-    addresses = ["http://www.mediamond.fi", "https://wp.pl", "http://www.mediamond.fi"]
+    alerts = [(1, "https://www.onet.pl"), (2, "https://wp.pl"), (3, "http://www.youtube.com")]
     tags = ["h1", "h2", "h3", "p"]
-    x = get_diffs(tags,[alert[0] for alert in alerts],[alert[1] for alert in alerts],15)
+    x = get_diffs(tags, [alert[0] for alert in alerts], [alert[1] for alert in alerts], 15)
     for elem in get_diffs_string_format(x, tags):
         print(elem)
