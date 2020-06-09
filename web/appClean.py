@@ -13,15 +13,23 @@ import DataBaseStructure as dbs
 
 
 
+# -------------------------------------------------------
+# -- Sending class is a Thread that sends all given changes with all communication channels
+# --
+# -- __init__ has param @changes which is a List of Tuples (int,str) where int is alert_id and str
+# -- is a content of a change assigned for that alert_id
+# -- Thanks to given alert_id, we take out of the db inforamtion about user we have to send changes
+# -- If communication channel is a Discord, Thread add given change to Db Table changes. Other channels
+# -- are being handeled thanks to messenger.py module that is abstract class handling logging into email/fb/telegram(undone)
+# -- and sending message
+# -- closes after job's done
 
- 
 class Sending(threading.Thread):
     def __init__(self,changes):
         threading.Thread.__init__(self)
         self.changes =changes
     def run(self):
         for item in  self.changes:
-            # z itema wyciągamy alert_id i content
             content=item[1]
             alert_id=item[0]
             al, user, apps = dbs.get_everything(alert_id)
@@ -43,7 +51,9 @@ class Sending(threading.Thread):
             if discord==True:
                 dbs.add_to_changes(item)
 
-
+# -- Thread that works always, it detects changes with siteMonitor module and starting SENDING Thread if there is any changes to send
+# -- IN: List of Alerts Alert- Tuple(alert_id,alert_webpage)
+# -- OUT: changes List of Tuple(alert_id, change)
 class Detecting(threading.Thread):
 
     def __init__(self):
@@ -72,7 +82,7 @@ class Detecting(threading.Thread):
             if len(changes)!=0:
                 Sending(changes).start()
 
- 
+
 o=Detecting()
 o.start()
 # ---------------------------------------
