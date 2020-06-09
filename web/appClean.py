@@ -41,7 +41,7 @@ class Sending(threading.Thread):
                 notifier.log_into(fblogin,fbpass)
                 notifier.message_myself(content,alertwebpage)
             if discord==True:
-                add_to_changes(item)
+                dbs.add_to_changes(item)
 
 
 class Detecting(threading.Thread):
