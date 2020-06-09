@@ -324,20 +324,20 @@ def logout():
     logout_user()
     return redirect('/')
 
-@dbs.app.route('/changes', methods=['GET'])
+@app.route('/changes', methods=['GET'])
 def changes():
-    change = dbs.ChangesForDiscord.query.first()
+    change = ChangesForDiscord.query.first()
     if change is None:
-        return jsonify({"change": '', "discid": -1})
+        return jsonify({'change': '', 'title': '', 'page': '', 'discid': -1})
 
-    dbs.db.session.delete(change)
-    dbs.db.session.commit()
-    alrt = dbs.Alert.query.filter_by(id = change.alert_id).first()
-    usr = dbs.User.query.filter_by(id = alrt.user_id).first()
+    db.session.delete(change)
+    db.session.commit()
+    alrt = Alert.query.filter_by(id = change.alert_id).first()
+    usr = User.query.filter_by(id = alrt.user_id).first()
     if usr is None:
-        return jsonify({"change": '', "discid": -1})
+        return jsonify({'change': '', 'title': '', 'page': '', 'discid': -1})
 
-    result = jsonify({"change": change.content, "discid": usr.discord_id})
+    result = jsonify({'change': change.content, 'title': alrt.title, 'page': alrt.page, 'discid': usr.discord_id})
     return result
 
 
