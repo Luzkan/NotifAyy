@@ -476,16 +476,16 @@ def logout():
 def changes():
     change = ChangesForDiscord.query.first()
     if change is None:
-        return jsonify({"change": '', "discid": -1})
+        return jsonify({'change': '', 'title': '', 'page': '', 'discid': -1})
 
     db.session.delete(change)
     db.session.commit()
     alrt = Alert.query.filter_by(id = change.alert_id).first()
     usr = User.query.filter_by(id = alrt.user_id).first()
     if usr is None:
-        return jsonify({"change": '', "discid": -1})
+        return jsonify({'change': '', 'title': '', 'page': '', 'discid': -1})
 
-    result = jsonify({"change": change.content, "discid": usr.discord_id})
+    result = jsonify({'change': change.content, 'title': alrt.title, 'page': alrt.page, 'discid': usr.discord_id})
     return result
 
 
